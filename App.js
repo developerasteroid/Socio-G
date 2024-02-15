@@ -1,20 +1,57 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, View, StatusBar, useColorScheme} from 'react-native';
+
+
+
+
+// put your import line below
+
+
+
+
+
+
+
+
+
+
+
+
+//end of import line
+
+
 
 export default function App() {
+  
+  // const isDarkMode = useColorScheme() === 'dark';
+  StatusBar.setBackgroundColor('#000000');
+  
+
+  
+
   return (
-    <View style={styles.container}>
-      <Text>Welcome to Socio-G!</Text>
-      <StatusBar style="auto" />
+    <>
+    <StatusBar/>
+    <View style={styles.safeContainer}>
+      <View style={[styles.mainContainer]}>
+
+      </View>
     </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  safeContainer: {
+    
   },
+  mainContainerColorLight:{
+    backgroundColor:'#ffffff',
+  },
+  mainContainerColorDark:{
+    backgroundColor:'#000000',
+  },
+  mainContainer: {
+    height: '100%',
+    backgroundColor:'#ffffff'
+  }
 });
