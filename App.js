@@ -4,7 +4,7 @@ import {StyleSheet, View, StatusBar, useColorScheme} from 'react-native';
 
 
 // put your import line below
-
+import Signup from './components/Signup';
 
 
 
@@ -23,7 +23,7 @@ import {StyleSheet, View, StatusBar, useColorScheme} from 'react-native';
 export default function App() {
   
   // const isDarkMode = useColorScheme() === 'dark';
-  StatusBar.setBackgroundColor('#000000');
+  
   
 
   
@@ -33,7 +33,7 @@ export default function App() {
     <StatusBar/>
     <View style={styles.safeContainer}>
       <View style={[styles.mainContainer]}>
-
+        <Signup/>
       </View>
     </View>
     </>
