@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, useColorScheme, StatusBar, DatePickerIOS, Touchable} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, useColorScheme, StatusBar, KeyboardAvoidingView, ScrollView} from 'react-native';
 export default function Signup(){
     const isDarkMode = useColorScheme() === 'dark';
     const bgImg = isDarkMode? require('../assets/login-bg-dark.png'): require('../assets/login-bg-light.png');
@@ -47,7 +47,9 @@ export default function Signup(){
           onChange={handleDateChange}
         />
       )}
+      
             <View style={[styles.container]}>
+            <ScrollView>
             <Text style={[styles.txtsignup, dynamicStyle.txtcl1]}>Sign Up</Text>
             <View style={styles.bxAlrdySignIn}>
             <Text style={[styles.txtalrdyact, dynamicStyle.txxtcl2]}> Already have a account ? </Text>
@@ -72,6 +74,7 @@ export default function Signup(){
             <View style={styles.nextBtnContn}>
             <TouchableOpacity style={styles.nextBtn}><Text style={styles.txtNextBtn}>Next</Text></TouchableOpacity>
             </View>
+            </ScrollView>
             </View>
         </ImageBackground>
         </>
