@@ -6,6 +6,7 @@ import {StyleSheet, View, StatusBar, useColorScheme} from 'react-native';
 // put your import line below
 import Signup from './components/Signup';
 import Profile from './components/Profile';
+import Home from './components/Home';
 
 
 
@@ -35,7 +36,8 @@ export default function App() {
     <View style={styles.safeContainer}>
       <View style={[styles.mainContainer]}>
         {/* <Signup/> */}
-        <Profile/>
+        {/* <Profile/> */}
+        <Home/>
       </View>
     </View>
     </>
