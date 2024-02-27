@@ -24,7 +24,9 @@ import Home from './components/Home';
 
 export default function App() {
   
-  // const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === 'dark';
+  StatusBar.setBarStyle(isDarkMode?'light-content':'dark-content');
+
   
   
 

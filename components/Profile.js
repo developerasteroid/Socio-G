@@ -1,8 +1,8 @@
-import {Text, StyleSheet, View, Image, TouchableOpacity} from 'react-native'
+import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView} from 'react-native'
 export default function Profile(){
     return(
         <>
-        <View style={styles.mainContainer}>
+        <SafeAreaView style={styles.mainContainer}>
             <View style={styles.topBox}>
                 <Text style={styles.username}>Jhon_</Text>
                 <View>
@@ -54,7 +54,7 @@ export default function Profile(){
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </SafeAreaView>
         </>
     );
 }
@@ -62,7 +62,7 @@ export default function Profile(){
 const styles = StyleSheet.create({
     mainContainer:{
         flex: 1,
-        backgroundColor:'#191919',
+        backgroundColor:'#000',
     },
     topBox:{
         // backgroundColor:'#0f0',
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         paddingVertical:3
     },
     countsBox:{
-        backgroundColor:'#666',
+        backgroundColor:'#555',
         flex:1,
         alignItems:'center',
         padding:5,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         marginTop:6
     },
     editProfileBtn:{
-        backgroundColor:'#666',
+        backgroundColor:'#555',
         justifyContent:'center',
         alignItems:'center',
         paddingVertical:10,

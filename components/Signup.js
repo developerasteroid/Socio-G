@@ -18,8 +18,8 @@ export default function Signup(){
     }
 
     //for status bar
-    StatusBar.setBackgroundColor(isDarkMode?'#000000':'#ffffff');
-    StatusBar.setBarStyle(isDarkMode?'light-content':'dark-content');
+    // StatusBar.setBackgroundColor(isDarkMode?'#000000':'#ffffff');
+    // StatusBar.setBarStyle(isDarkMode?'light-content':'dark-content');
     
     const dynamicStyle = StyleSheet.create({
         txtcl1:{
