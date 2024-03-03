@@ -4,7 +4,13 @@ export default function Home(){
     const [isRefresh, setIsRefresh] = useState(false);
 
     const [storyData, setStoryData] = useState([]);
+    let storyDataArray = [];
     const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+
+    let unlikedImg = require('../assets/unlike-icon.png');
+    let likedImg = require('../assets/liked-icon.png');
+    let commentImg = require('../assets/comment-icon.png');
+    let sendImg = require('../assets/send-icon.png');
 
     // useEffect(() => {
     //     const updateScreenWidth = () => {
@@ -27,63 +33,100 @@ export default function Home(){
 
     const fetchData = () =>{
         setIsRefresh(true)
-        setStoryData([
+        storyDataArray = [
             {
-                name:'Suman',
-                image:'https://picsum.photos/800/1000',
-                width:'800',
-                height:'1000',
-                caption:"Hey this is my caption"
+                profile:'https://picsum.photos/100/100',
+                name:'suman',
+                image:'https://media.istockphoto.com/id/683424284/photo/field-with-flower-in-the-mountain-valley-beautiful-natural-landscape-in-the-summer-time.webp?b=1&s=170667a&w=0&k=20&c=lvtFDgBISJmg8pyFWfShyK3gBN11WBfeYuNSTQKKICg=',
+                width:'410',
+                height:'419',
+                caption:"Feeling on top of the world 🌍✨ \n#adventuretime",
+                date:'2 hours ago',
+                liked:true
             },
             {
-                name:'Satwik',
+                profile:'https://picsum.photos/50/50',
+                name:'suvith',
                 image:'https://picsum.photos/400/550',
                 width:'400',
-                height:'550'
+                height:'550',
+                caption:'Chasing dreams and sunsets 🌅💫 \n#wanderlust',
+                date:'16 hours ago',
+                liked:false
             },
             {
-                name:'Ashwith',
+                profile:'https://picsum.photos/60/60',
+                name:'ashwith',
                 image:'https://picsum.photos/400/500',
                 width:'400',
-                height:'500'
+                height:'500',
+                caption:'Coffee ☕️ and creativity 🎨 fueling my day #productive',
+                date:'2 days ago',
+                liked:false
             },
             {
-                name:'Athmik',
+                profile:'https://picsum.photos/60/60',
+                name:'athmik',
                 image:'https://picsum.photos/400/580',
                 width:'400',
-                height:'580'
+                height:'580',
+                caption:'Making memories with the ones who matter most ❤️👫 #familytime',
+                date:'',
+                liked:false
             },
             {
-                name:'Suvith',
+                profile:'https://picsum.photos/60/60',
+                name:'satwik',
                 image:'https://picsum.photos/800/600',
                 width:'800',
-                height:'600'
+                height:'600',
+                caption:'',
+                date:'',
+                liked:false
             },
             {
-                name:'Rahul',
+                profile:'https://picsum.photos/60/60',
+                name:'rahul',
                 image:'https://picsum.photos/400/400',
                 width:'400',
-                height:'400'
+                height:'400',
+                caption:'',
+                date:'',
+                liked:false
             },
             {
+                profile:'https://picsum.photos/60/60',
                 name:'dhanush',
                 image:'https://picsum.photos/400/620',
                 width:'400',
-                height:'620'
+                height:'620',
+                caption:'',
+                date:'',
+                liked:false
             },
             {
-                name:'Nikshith',
+                profile:'https://picsum.photos/60/60',
+                name:'nikshith',
                 image:'https://picsum.photos/500/500',
                 width:'500',
-                height:'500'
+                height:'500',
+                caption:'',
+                date:'',
+                liked:false
             },
             {
-                name:'Harshith',
+                profile:'https://picsum.photos/60/60',
+                name:'harshith',
                 image:'https://picsum.photos/500/600',
                 width:'500',
-                height:'600'
+                height:'600',
+                caption:'',
+                date:'',
+                liked:false
             },
-        ])
+        ]
+        
+        setStoryData(storyDataArray)
         // console.log(screenWidth)
         // setTimeout(()=>{setIsRefresh(false)}, 3000)
         setIsRefresh(false);
@@ -98,7 +141,7 @@ export default function Home(){
         <View style={styles.feedCard}>
             <View style={styles.feedTopBx}>
             <Image
-                source={{uri:'https://picsum.photos/60/60'}}
+                source={{uri:item.profile}}
                 style={{width:32, height:32, borderRadius:20}}
             />
             <Text style={styles.feedUserName}>{item.name}</Text>
@@ -110,19 +153,20 @@ export default function Home(){
             <View style={styles.feedBottomBx}>
                 <View style={styles.like_cmt_shr_icn_container}>
                 <Image 
-                source={require('../assets/unlike-icon.png')}
-                style={styles.bottomIcon}
+                source={item.liked? likedImg : unlikedImg}
+                style={[item.liked ? {} : styles.bottomIconClr, styles.bottomIconSize]}
                 />
                 <Image 
-                source={require('../assets/comment-icon.png')}
-                style={styles.bottomIcon}
+                source={commentImg}
+                style={[styles.bottomIconClr, styles.bottomIconSize]}
                 />
                 <Image 
-                source={require('../assets/share-icon.png')}
-                style={styles.bottomIcon}
+                source={sendImg}
+                style={[styles.bottomIconClr, styles.bottomIconSize]}
                 />
                 </View>
-                <Text style={styles.captionTxt}>{item.name} {item.caption}</Text>
+                <Text style={[styles.captionTxt, item.caption == ""? {display:'none'}: {display:'flex'}]}><Text style={styles.unameCaption}>{item.name}</Text> {item.caption}</Text>
+                <Text style={styles.postedDate}>{item.date}</Text>
             </View>
         </View>
     )}
@@ -218,23 +262,34 @@ const styles = StyleSheet.create({
     feedUserName:{
         color:'#fff',
         fontSize:16,
-        marginLeft:5
+        marginLeft:8,
+        includeFontPadding:false
     },
     feedBottomBx:{
-        paddingVertical:8
+        paddingVertical:8,
+        marginHorizontal:14
     },
     like_cmt_shr_icn_container:{
-        flexDirection:'row'
+        flexDirection:'row',
+        gap:25
+        
     },
-    bottomIcon:{
-        tintColor:'#fff',
-        width:26,
-        height:26,
-        marginHorizontal:10
+    bottomIconClr:{
+        tintColor:'#fff'
+    },
+    bottomIconSize:{
+        width:24,
+        height:24
+    },
+    unameCaption:{
+        fontWeight:'bold'
     },
     captionTxt:{
         marginTop:10,
-        marginHorizontal:10,
         color:'#fff'
+    },
+    postedDate:{
+        color:'#777',
+        fontSize:13
     }
 });
