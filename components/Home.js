@@ -2,6 +2,7 @@ import {View, StyleSheet, Text, SafeAreaView, TouchableOpacity, Image, FlatList,
 import { useState, useEffect } from 'react'
 export default function Home(){
     const [isRefresh, setIsRefresh] = useState(false);
+    const [fetchError, setFetchError] = useState(false);
 
     const [storyData, setStoryData] = useState([]);
     let storyDataArray = [];
@@ -11,6 +12,7 @@ export default function Home(){
     let likedImg = require('../assets/liked-icon.png');
     let commentImg = require('../assets/comment-icon.png');
     let sendImg = require('../assets/send-icon.png');
+    const ipAddress = "172.21.6.7";
 
     // useEffect(() => {
     //     const updateScreenWidth = () => {
@@ -31,102 +33,25 @@ export default function Home(){
 
     
 
-    const fetchData = () =>{
+    const fetchData = async() =>{
         setIsRefresh(true)
-        storyDataArray = [
-            {
-                profile:'https://picsum.photos/100/100',
-                name:'suman',
-                image:'https://media.istockphoto.com/id/683424284/photo/field-with-flower-in-the-mountain-valley-beautiful-natural-landscape-in-the-summer-time.webp?b=1&s=170667a&w=0&k=20&c=lvtFDgBISJmg8pyFWfShyK3gBN11WBfeYuNSTQKKICg=',
-                width:'410',
-                height:'419',
-                caption:"Feeling on top of the world 🌍✨ \n#adventuretime",
-                date:'2 hours ago',
-                liked:true
-            },
-            {
-                profile:'https://picsum.photos/50/50',
-                name:'suvith',
-                image:'https://picsum.photos/400/550',
-                width:'400',
-                height:'550',
-                caption:'Chasing dreams and sunsets 🌅💫 \n#wanderlust',
-                date:'16 hours ago',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'ashwith',
-                image:'https://picsum.photos/400/500',
-                width:'400',
-                height:'500',
-                caption:'Coffee ☕️ and creativity 🎨 fueling my day #productive',
-                date:'2 days ago',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'athmik',
-                image:'https://picsum.photos/400/580',
-                width:'400',
-                height:'580',
-                caption:'Making memories with the ones who matter most ❤️👫 #familytime',
-                date:'',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'satwik',
-                image:'https://picsum.photos/800/600',
-                width:'800',
-                height:'600',
-                caption:'',
-                date:'',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'rahul',
-                image:'https://picsum.photos/400/400',
-                width:'400',
-                height:'400',
-                caption:'',
-                date:'',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'dhanush',
-                image:'https://picsum.photos/400/620',
-                width:'400',
-                height:'620',
-                caption:'',
-                date:'',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'nikshith',
-                image:'https://picsum.photos/500/500',
-                width:'500',
-                height:'500',
-                caption:'',
-                date:'',
-                liked:false
-            },
-            {
-                profile:'https://picsum.photos/60/60',
-                name:'harshith',
-                image:'https://picsum.photos/500/600',
-                width:'500',
-                height:'600',
-                caption:'',
-                date:'',
-                liked:false
-            },
-        ]
+        try{
+            const data = await fetch(`http://${ipAddress}:9907/fetch/feed`, {
+                method:'post'
+            })
+            
+            
+            if(data.ok){
+                storyDataArray = await data.json();
+                setStoryData(storyDataArray);
+                setFetchError(false);
+            } else {
+                setFetchError(true);
+            }
+        } catch(e){
+            setFetchError(true);
+        }
         
-        setStoryData(storyDataArray)
         // console.log(screenWidth)
         // setTimeout(()=>{setIsRefresh(false)}, 3000)
         setIsRefresh(false);
@@ -135,6 +60,19 @@ export default function Home(){
 
 
 
+    const renderFeedFooter = () => {
+        return (
+            <>
+            {fetchError && (<View style={styles.errorContainer}>
+                <Text style={styles.fetchErrorTxt}>! Something went wrong.</Text>
+                <Image
+                source={require('../assets/crying.png')}
+                style={{width:80, height:80}}
+                />
+                </View>)}
+            </>
+        )
+    }
 
     const renderFeed = ({item}) => {
         return(
@@ -193,6 +131,7 @@ export default function Home(){
                     onRefresh={fetchData}
                     />
                 }
+                ListFooterComponent={renderFeedFooter}
             />
         </View>
         </SafeAreaView>
@@ -291,5 +230,14 @@ const styles = StyleSheet.create({
     postedDate:{
         color:'#777',
         fontSize:13
+    },
+    fetchErrorTxt:{
+        color:'#ff5555',
+        paddingVertical:20,
+        fontSize:20
+    },
+    errorContainer:{
+        alignItems:'center',
+        paddingBottom:20
     }
 });

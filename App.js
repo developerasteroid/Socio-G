@@ -40,8 +40,8 @@ export default function App() {
       <View style={[styles.mainContainer]}>
         {/* <Signup/> */}
         {/* <Profile/> */}
-        {/* <Home/> */}
-        <Login/>
+        <Home/>
+        {/* <Login/> */}
       </View>
     </View>
     </>
