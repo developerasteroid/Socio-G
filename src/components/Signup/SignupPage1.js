@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, useColorScheme, StatusBar, KeyboardAvoidingView, ScrollView} from 'react-native';
+import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, useColorScheme, StatusBar, KeyboardAvoidingView, ScrollView, Platform} from 'react-native';
 
 export default function SignupPage1({navigation}){
     const isDarkMode = useColorScheme() === 'dark';
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         borderWidth:2,
         borderRadius:15,
         paddingHorizontal:12,
-        paddingVertical:5,
+        paddingVertical:(Platform.OS == 'ios'?10:5),
     },
     errorTxtMessage:{
         color:'#f00'

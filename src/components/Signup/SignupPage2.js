@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, ActivityIndicator, useColorScheme, Image, StatusBar, KeyboardAvoidingView, ScrollView, Alert} from 'react-native';
-import axiosInstance from './../../config/axiosConfig'
+import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, ActivityIndicator, useColorScheme, Image, StatusBar, KeyboardAvoidingView, ScrollView, Alert, Platform} from 'react-native';
+import { IP_ADDRESS, PORT } from '../../constants';
+import axios from 'axios';
 
 export default function SignupPage2({navigation, route}){
     const isDarkMode = useColorScheme() === 'dark';
@@ -149,21 +150,26 @@ export default function SignupPage2({navigation, route}){
         const {name, email, phone, dob} = route.params;
         const values = {
             name:name,
-            email:email,
+            email:email.toLowerCase(),
             mobileNumber:phone,
             dateOfBirth:dob,
-            username:username,
+            username:username.toLowerCase(),
             password:password
         }
         // `http://${IP_ADDRESS}:${PORT}/api/auth/register`
         try {
+            const axiosInstance = axios.create({
+                baseURL:`http://${IP_ADDRESS}:${PORT}`,
+                timeout:15000,
+            });
+
             const result = await axiosInstance.post('/api/auth/register', values);
             if(result.status === 201){
                 if(result.data.message){
                     navigation.reset({
                         index: 0,
                         routes: [{ 
-                          name: 'RegisterSuccess',
+                          name: 'SuccessScreen1',
                           params: {name:name}
                         }],
                       });
@@ -178,7 +184,8 @@ export default function SignupPage2({navigation, route}){
         } catch (error) {
             if(error.response && error.response.status == 409 && error.response.data.message){
                 setUsernameError(error.response.data.message);
-            } else if(error.response.data.message){
+            } 
+            else if(error.response && error.response.data && error.response.data.message){
                 Alert.alert('Error:', error.response.data.message);
             }
             else {
@@ -275,7 +282,7 @@ export default function SignupPage2({navigation, route}){
             </View>
             </ScrollView>
             </View>
-            {loading && <View style={styles.loadingContainer}><ActivityIndicator style={styles.loading} size="large" color="#0000ff" /></View>}
+            {loading && <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#0000ff" /></View>}
         </ImageBackground>
         </>
     );
@@ -296,8 +303,6 @@ const styles = StyleSheet.create({
         backgroundColor:'#000000dd',
         justifyContent:'center',
         alignItems:'center'
-    },
-    loading:{
     },
     backBtn:{
         position:'absolute',
@@ -330,7 +335,7 @@ const styles = StyleSheet.create({
         borderWidth:2,
         borderRadius:15,
         paddingHorizontal:12,
-        paddingVertical:5,
+        paddingVertical:(Platform.OS == 'ios'?10:5),
     },
     errorTxtMessage:{
         color:'#f00'

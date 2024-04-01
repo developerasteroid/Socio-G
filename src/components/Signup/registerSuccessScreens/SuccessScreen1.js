@@ -1,9 +1,9 @@
 import {Text, View, StyleSheet, TouchableOpacity, ImageBackground, useColorScheme, Image} from 'react-native';
-import { APP_NAME } from '../../constants';
+import { APP_NAME } from '../../../constants'; 
 
-export default function RegisterSuccess({navigation, route}){
+export default function SuccessScreen1({navigation, route}){
     const isDarkMode = useColorScheme() === 'dark';
-    const bgImg = isDarkMode? require('../../../assets/login-bg-dark.png'): require('../../../assets/login-bg-light.png');
+    const bgImg = isDarkMode? require('../../../../assets/login-bg-dark.png'): require('../../../../assets/login-bg-light.png');
 
 
     
@@ -16,7 +16,7 @@ export default function RegisterSuccess({navigation, route}){
         <ImageBackground source={bgImg} style={styles.mainBox} resizeMode='cover'>
             <View>
 
-            <Text style={styles.greetTxt}>Welcome to {APP_NAME}, {route.params.name? route.params.name : ''}!</Text>
+            <Text style={styles.greetTxt}>Welcome to {APP_NAME}, {route.params && route.params.name? route.params.name : ''}!</Text>
             <View style={styles.msgBx}>
                 <Text style={styles.messages}>
                     Congratulations on joining our community! 🌟 {'\n'} 
@@ -39,7 +39,7 @@ export default function RegisterSuccess({navigation, route}){
                 <TouchableOpacity style={styles.nxtbtnImg}>
                     <Image
                         style={styles.nxtbtnImg}
-                        source={require('./../../../assets/right-arrow-icon.png')}
+                        source={require('./../../../../assets/right-arrow-icon.png')}
                     />
                 </TouchableOpacity>
             </View>
