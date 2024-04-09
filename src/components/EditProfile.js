@@ -5,9 +5,14 @@ import axiosInstance from '../config/axiosConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { IP_ADDRESS, PORT } from '../constants';
+import * as FileSystem from 'expo-file-system';
+
+
+
 
 export default function EditProfile({navigation}){
     const [token, setToken] = useState('');
+    const [previousData, setPreviousData] = useState({});
     const [dataLoaded, setDataLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [dataSubmitted, setDataSubmitted] = useState(false);
@@ -39,12 +44,13 @@ export default function EditProfile({navigation}){
             const result = await axiosInstance.get('api/user/profile/');
             if(result.status === 200 && result.data){
                 setIsLoading(false);
+                setPreviousData(result.data);
                 setDataLoaded(true);
                 setUsername(result.data.username);
                 setName(result.data.name);
                 setProfession(result.data.profession);
                 setBio(result.data.bio);
-                setProfileImgUri(`http://${IP_ADDRESS}:${PORT}/api/user/profile/image/${tkn}/${result.data.profileUri}`)
+                setProfileImgUri(result.data.profileUri)
 
             } else {
                 setIsLoading(false);
@@ -134,8 +140,10 @@ export default function EditProfile({navigation}){
 
 
 
+
+
     const handleOnSubmit = async() => {
-        setDataSubmitted
+        setDataSubmitted(true);
         setLoading(true);
         setNameError('');
         setUsernameError('');
@@ -144,30 +152,121 @@ export default function EditProfile({navigation}){
 
         if(!validateName(name)){
             setLoading(false); 
+            setDataSubmitted(false);
             setNameError('Name connot contain special character. you can use _ and .');
             return;
         } else if(!name){
             setLoading(false);
+            setDataSubmitted(false);
             setNameError('Name is required');
             return;
         }
 
         if(!validateUsername()){
             setLoading(false);
+            setDataSubmitted(false);
+            return;
+        }
+
+        if(previousData.username != username){        
+            try {
+                let response = await axiosInstance.post('api/auth/check/username', {username});
+                if(response.status === 200){
+                    setUsernameError('Username already exists');
+                    setLoading(false);
+                    setDataSubmitted(false);
+                    return;
+                }
+            } catch (error) {
+                if(error.response && error.response.status == 404){
+
+                } else {
+                    alert(error.message);
+                    setLoading(false);
+                    setDataSubmitted(false);
+                    return;
+                }
+            }
+        }
+
+
+
+
+
+
+        if(imageUpdated){
+            if(profileImgUri){
+                try {
+                    const imageInfo = await FileSystem.getInfoAsync(profileImgUri);
+                    const fileName = profileImgUri.substring(profileImgUri.lastIndexOf('/') + 1);
+                    const fileType = 'image/' + profileImgUri.substring(profileImgUri.lastIndexOf('.') + 1);
+                    if(!imageInfo.exists){
+                        setLoading(false);
+                        setDataSubmitted(false);
+                        alert('Image file is missing');
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('image', {
+                      uri: profileImgUri,
+                      name: fileName,
+                      type: fileType,
+                    });
+              
+                    const response = await axiosInstance.post(`api/user/profile/update/upload`, formData, {
+                      headers: {
+                        'Content-Type': 'multipart/form-data',
+                      },
+                    });
+
+                    
+                  } catch (error) {
+                    setLoading(false);
+                    setDataSubmitted(false);
+                    alert('Error updating profile Image: ' + error.message);
+                    return;
+                  }
+            } else {
+                try {
+                    const response = await axiosInstance.post(`api/user/profile/update/upload`, {image: null});
+                } catch (error) {
+                    setLoading(false);
+                    setDataSubmitted(false);
+                    alert('Error updating profile Image: ' + error.message);
+                    return;
+                }
+            }
+        }
+
+
+
+        try {
+            const values = {
+                name: name,
+                username: username,
+                profession: profession? profession : null,
+                bio: bio? bio : null,
+            }
+            const response = await axiosInstance.post(`api/user/profile/update/details`, values);
+        } catch (error) {
+            setLoading(false);
+            setDataSubmitted(false);
+            alert('Error updating profile: ' + error.message);
             return;
         }
 
 
 
-        if(imageUpdated){
-            alert("updated")
-        }
 
 
 
+
+        setLoading(false);
+        setDataSubmitted(false);
 
         navigation.pop();
-        navigation.replace('Profile');
+        navigation.replace('Profile'); 
     }
 
     if(!dataLoaded){
