@@ -92,7 +92,7 @@ export default function Profile({navigation}){
                 <View style={styles.profileSubBx1}>
                     <View>
                         <Image
-                        source={{uri: `http://${IP_ADDRESS}:${PORT}/api/user/profile/image/${token}/${profileImgUri}`}}
+                        source={profileImgUri ? {uri: profileImgUri} : require('../../assets/profile-default.png')}
                         style={styles.profileImg}
                         />
                     </View>
