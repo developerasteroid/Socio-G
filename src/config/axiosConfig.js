@@ -2,6 +2,7 @@ import axios from "axios";
 import { IP_ADDRESS, PORT } from "../constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { reset } from "../utils/NavigationUtils";
+import { logout } from "../utils/Functions";
 
 
 const axiosInstance = axios.create({
@@ -31,8 +32,7 @@ axiosInstance.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             // Handle 401 error (Unauthorized)
             // Redirect to login screen using your navigation function
-            await AsyncStorage.removeItem('token');
-            reset('Login');
+            await logout();
         }
 
       // Return the error if the request failed

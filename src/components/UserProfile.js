@@ -1,19 +1,33 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator} from 'react-native'
-
+import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator, Alert} from 'react-native'
+import { reset } from '../utils/NavigationUtils';
 import { useEffect, useState } from 'react';
 import axiosInstance from '../config/axiosConfig';
-import { IP_ADDRESS, PORT } from '../constants';
-import BottomNavigation from './BottomNavigation';
-import { logout } from '../utils/Functions';
+import CustomAlert from './CustomAlert';
 
 
-export default function Profile({navigation}){
-    const [token, setToken] = useState('');
-    const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
+export default function UserProfile({navigation, route}){
+    
+
+    if(!(route.params && route.params.uid)){
+        return(
+            <View style={{flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#000'}}>
+                <Text style={{color:'#ff0000'}}>User not found</Text>
+                <TouchableOpacity 
+                style={{paddingVertical:10, paddingHorizontal:20, backgroundColor:"#00f", margin:10, borderRadius:20}}
+                onPress={()=>{navigation.goBack()}}
+                >
+                    <Text style={{color:'#ffffff'}}>Go Back</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    const {uid} = route.params;
 
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
+    const [followBtnClicked, setFollowBtnClicked] = useState(false);
 
     const [username, setUsername] = useState(null);
     const [name, setName] = useState(null);
@@ -24,11 +38,14 @@ export default function Profile({navigation}){
     const [postCount, setPostCount] = useState('0');
     const [followerCount, setFollowerCount] = useState('0');
     const [followingCount, setFollowingCount] = useState('0');
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [isFollowRequested, setIsFollowRequested] = useState(false);
+
 
     const getData = async() => {
-        // setToken(await AsyncStorage.getItem('token'));
         try {
-            const result = await axiosInstance.get('api/user/profile/');
+            const result = await axiosInstance.get(`api/user/profile/${uid}`);
             if(result.status === 200 && result.data){
                 setIsLoading(false);
                 setUsername(result.data.username);
@@ -40,6 +57,9 @@ export default function Profile({navigation}){
                 setPostCount(result.data.postCount);
                 setFollowerCount(result.data.followerCount);
                 setFollowingCount(result.data.followingCount);
+                setIsFollowing(result.data.isFollowing);
+                setIsPrivate(result.data.isPrivate);
+                setIsFollowRequested(result.data.isFollowRequested);
 
             } else {
                 setIsLoading(false);
@@ -75,18 +95,37 @@ export default function Profile({navigation}){
         );
     }
 
+    const handleFollowBtnPress = () => {
+        if(followBtnClicked){
+            return;
+        }
+        setFollowBtnClicked(true);
+        
+
+        // setTimeout(()=>{setFollowBtnClicked(false)}, 2000);
+    }
+
 
 
     return(
         <>
-        <View style={[styles.mainContainer, {paddingBottom: bottomNavigationHeight}]}>
+        <View style={styles.mainContainer}>
+            <CustomAlert visible={followBtnClicked} onClose={()=>{setFollowBtnClicked(false)}}/>
             <View style={styles.topBox}>
+                <View style={{flexDirection:'row', alignItems:'center'}}>
+                <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+                    <Image
+                    source={require('./../../assets/left-back-icon.png')}
+                    style={styles.backBtnIcon}
+                    />
+                </TouchableOpacity>
                 <Text style={styles.username}>{username}</Text>
+                </View>
                 <View>
-                    <TouchableOpacity onPress={async()=>{await logout();}}>
+                    <TouchableOpacity>
                     <Image
                     style={styles.menu_icon}
-                    source={require('../../assets/menu-icon.png')}
+                    source={require('../../assets/dot-menu-icon.png')}
                     />
                     </TouchableOpacity>
                 </View>
@@ -127,13 +166,23 @@ export default function Profile({navigation}){
                     <Text style={styles.professionTxt}>{profession}</Text>
                     <Text style={styles.bioTxt}>{bio}</Text>
                 </View>
-                <View>
-                    <TouchableOpacity style={styles.editProfileBtn} onPress={()=>{navigation.navigate('EditProfile')}}>
-                        <Text style={styles.editProfileTxt}>Edit profile</Text>
+                <View style={{flexDirection:'row', alignItems:'center', gap:8}}>
+                    <TouchableOpacity style={[styles.followBtn, {backgroundColor: (isFollowing || isFollowRequested)? '#555' : '#1f7eff'}]} onPress={handleFollowBtnPress}>
+                        {
+                            followBtnClicked ? 
+                            <ActivityIndicator size='small' color='#ffffff'/> 
+                            :
+                            <Text style={styles.followTxt}>{isFollowing? 'Following' : (isFollowRequested ? 'Requested' : 'Follow')}</Text>
+                        }
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.chatBtn}>
+                        <Image
+                        source={require('./../../assets/chat-icon.png')}
+                        style={styles.chatBtnImg}
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
-            <BottomNavigation componentHightSetter={setBottomNavigationHeight}/>
         </View>
         </>
     );
@@ -158,11 +207,18 @@ const styles = StyleSheet.create({
         paddingHorizontal:25,
         paddingVertical:10
     },
+    backBtnIcon:{
+        width:24,
+        height:24,
+        tintColor:'#fff',
+        marginRight:22
+    },
     username:{
         fontSize:22,
         fontWeight:'500',
         textTransform:'lowercase',
-        color:'#fff'
+        color:'#fff',
+        paddingBottom:5
     },
     menu_icon:{
         width:26,
@@ -237,14 +293,26 @@ const styles = StyleSheet.create({
         color:'#ccc',
         marginTop:6
     },
-    editProfileBtn:{
-        backgroundColor:'#555',
+    followBtn:{
         justifyContent:'center',
         alignItems:'center',
         paddingVertical:10,
-        borderRadius:15
+        borderRadius:15,
+        flex:1
     },
-    editProfileTxt:{
+    followTxt:{
         color:'#fff'
+    },
+    chatBtn:{
+        backgroundColor:'#555',
+        padding:9,
+        height:38,
+        width:38,
+        borderRadius:10
+    },
+    chatBtnImg:{
+        height:20,
+        width:20,
+        tintColor:'#ddd'
     }
 });

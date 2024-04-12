@@ -73,8 +73,9 @@ export default function Login({navigation}){
             });
             const result = await axiosInstance.post('/api/auth/login', value);
             if(result.status === 200){
-                if(result.data && result.data.token){
+                if(result.data && result.data.token && result.data.uid){
                      await AsyncStorage.setItem('token', result.data.token);
+                     await AsyncStorage.setItem('uid', result.data.uid);
                      navigation.reset({
                         index: 0,
                         routes: [{ 

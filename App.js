@@ -13,6 +13,8 @@ import SuccessScreen1 from './src/components/Signup/registerSuccessScreens/Succe
 import SuccessScreen2 from './src/components/Signup/registerSuccessScreens/SuccessScreen2';
 import AuthVerify from './src/verification/AuthVerify';
 import EditProfile from './src/components/EditProfile';
+import FindUsers from './src/components/FindUsers';
+import UserProfile from './src/components/UserProfile';
 
 
 
@@ -51,7 +53,7 @@ export default function App() {
       screenOptions={{
           animationEnabled: false, // Disable animation
         }}
-      initialRouteName='SuccessScreen2'
+      initialRouteName='AuthVerify'
       >
         <Stack.Screen name="AuthVerify" component={AuthVerify} options={{headerShown:false}}/>
         <Stack.Screen name="DatePicker" component={PlatformIndependentDatePicker} options={{headerShown:false}}/>
@@ -62,6 +64,8 @@ export default function App() {
         <Stack.Screen name="SuccessScreen2" component={SuccessScreen2} options={{headerShown:false}}/>
         <Stack.Screen name="Profile" component={Profile} options={{headerShown:false}}/>
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}}/>
+        <Stack.Screen name="FindUser" component={FindUsers} options={{headerShown:false}}/>
+        <Stack.Screen name='UserProfile' component={UserProfile} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

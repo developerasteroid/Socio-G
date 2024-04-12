@@ -38,8 +38,8 @@ export default function EditProfile({navigation}){
     const [nameError, setNameError] = useState('');
 
     const getData = async() => {
-        let tkn = await AsyncStorage.getItem('token');
-        setToken(tkn);
+        // let tkn = await AsyncStorage.getItem('token');
+        // setToken(tkn);
         try {
             const result = await axiosInstance.get('api/user/profile/');
             if(result.status === 200 && result.data){
