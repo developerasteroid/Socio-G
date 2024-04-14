@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Image, TouchableOpacity, FlatList, TextInput } from "react-native";
-import { IP_ADDRESS, PORT } from "../constants";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../config/axiosConfig";
 import BottomNavigation from "./BottomNavigation";

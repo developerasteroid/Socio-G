@@ -27,7 +27,7 @@ export default function UserProfile({navigation, route}){
 
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
-    const [followBtnClicked, setFollowBtnClicked] = useState(false);
+    
 
     const [username, setUsername] = useState(null);
     const [name, setName] = useState(null);
@@ -41,6 +41,13 @@ export default function UserProfile({navigation, route}){
     const [isFollowing, setIsFollowing] = useState(false);
     const [isPrivate, setIsPrivate] = useState(false);
     const [isFollowRequested, setIsFollowRequested] = useState(false);
+
+
+    const [followBtnClicked, setFollowBtnClicked] = useState(false);
+    const [customAlertVisible, setCustomAlertVisible] = useState(false);
+    let promptComponent = customAlertVisible ? <CustomAlert visible={customAlertVisible} message={`If you want to follow again, you'll have to request to follow ${username} again.`} onCancel={()=>{setCustomAlertVisible(false); setFollowBtnClicked(false)}} onSuccess={()=>{setCustomAlertVisible(false); unfollowUser()}} successText='Unfollow'/> : null;
+    
+
 
 
     const getData = async() => {
@@ -75,11 +82,71 @@ export default function UserProfile({navigation, route}){
             }
         }
     }
+
+    const init = () => {
+        getData();
+    }
         
 
     useEffect(()=>{
-        getData();
+        init();
     }, []);
+
+    const unfollowUser = async() => {
+        try {
+            const response = await axiosInstance.post('api/user/unfollow', {targetUserId:uid});
+            if(response.status == 200){
+                setFollowerCount((count)=>count-1);
+                setIsFollowing(false);
+            }
+        } catch (error){
+            if(error.response && error.response.data && error.response.data.message){
+                alert(error.response.data.message);
+            } else {
+                alert(error.message);
+            }
+        }
+        setFollowBtnClicked(false);
+    }
+
+    const followUser = async() => {
+        try {
+            const response = await axiosInstance.post('api/user/follow', {targetUserId:uid});
+            if(response.status == 200){
+                if(isPrivate){
+                    setIsFollowRequested(true);
+                } else {
+                    setFollowerCount((count)=>count+1);
+                    setIsFollowing(true);
+                }
+            }
+        } catch (error){
+            if(error.response && error.response.data && error.response.data.message){
+                alert(error.response.data.message);
+            } else {
+                alert(error.message);
+            }
+        }
+        setFollowBtnClicked(false);
+    }
+
+    const removeFollowRequest = async() => {
+        try {
+            const response = await axiosInstance.post('api/user/follow/request/remove', {targetUserId:uid});
+            if(response.status == 200){
+                setIsFollowRequested(false);
+            }
+        } catch (error){
+            if(error.response && error.response.data && error.response.data.message){
+                alert(error.response.data.message);
+            } else {
+                alert(error.message);
+            }
+        }
+        setFollowBtnClicked(false);
+    }
+
+
 
 
     if(!username){
@@ -95,14 +162,24 @@ export default function UserProfile({navigation, route}){
         );
     }
 
-    const handleFollowBtnPress = () => {
+
+    const handleFollowBtnPress = async() => {
         if(followBtnClicked){
             return;
         }
         setFollowBtnClicked(true);
-        
 
-        // setTimeout(()=>{setFollowBtnClicked(false)}, 2000);
+        if(isFollowing && !isPrivate){
+            unfollowUser();
+        } else if(isFollowing && isPrivate){
+            setCustomAlertVisible(true);
+        } else if(isPrivate && isFollowRequested){
+            removeFollowRequest();
+        } else if(!isFollowing && !isFollowRequested){
+            followUser();
+        } else {
+            setFollowBtnClicked(false);
+        }
     }
 
 
@@ -110,7 +187,7 @@ export default function UserProfile({navigation, route}){
     return(
         <>
         <View style={styles.mainContainer}>
-            <CustomAlert visible={followBtnClicked} onClose={()=>{setFollowBtnClicked(false)}}/>
+            {promptComponent}
             <View style={styles.topBox}>
                 <View style={{flexDirection:'row', alignItems:'center'}}>
                 <TouchableOpacity onPress={()=>{navigation.goBack()}}>

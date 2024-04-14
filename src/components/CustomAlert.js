@@ -1,20 +1,21 @@
 import React from 'react';
 import { Modal, View, Text, Button, StyleSheet } from 'react-native';
 
-const CustomAlert = ({ visible, onClose, button1, button2 }) => {
+const CustomAlert = ({ visible, onClose, title = "Alert", message, onCancel, onSuccess, successText= "OK" }) => {
   return (
     <Modal
       animationType="slide"
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}>
+      onRequestClose={onClose || onCancel}>
       <View style={styles.container}>
         <View style={styles.alert}>
-          <Text style={styles.title}>Alert</Text>
-          <Text style={styles.message}>This is a custom alert.</Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.message}>{message}</Text>
           <View style={styles.buttons}>
-            <Button color={'#000'} backgroundColor={'#000'} title="Cancel" onPress={onClose} />
-            <Button color={'#000'} backgroundColor={'#000'} title="OK" onPress={onClose} />
+            
+            <Button style={styles.okBtn} color={'#000'} backgroundColor={'#000'} title={successText} onPress={onSuccess}/>
+            { onCancel && <Button color={'#000'} backgroundColor={'#000'} title="Cancel" onPress={onCancel}/> }
           </View>
         </View>
       </View>
@@ -46,12 +47,10 @@ const styles = StyleSheet.create({
     color:'#fff'
   },
   buttons: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     justifyContent: 'space-between',
-  },
-  btn:{
-    backgroundColor:'#fff'
   }
+  
 });
 
 export default CustomAlert;
