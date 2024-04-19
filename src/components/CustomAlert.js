@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal, View, Text, Button, StyleSheet } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const CustomAlert = ({ visible, onClose, title = "Alert", message, onCancel, onSuccess, successText= "OK" }) => {
+const CustomAlert = ({ visible, onClose, title, message, onCancel, onSuccess, successText= "OK" }) => {
   return (
     <Modal
       animationType="slide"
@@ -10,12 +10,11 @@ const CustomAlert = ({ visible, onClose, title = "Alert", message, onCancel, onS
       onRequestClose={onClose || onCancel}>
       <View style={styles.container}>
         <View style={styles.alert}>
-          <Text style={styles.title}>{title}</Text>
+          {title && <Text style={styles.title}>{title}</Text>}
           <Text style={styles.message}>{message}</Text>
           <View style={styles.buttons}>
-            
-            <Button style={styles.okBtn} color={'#000'} backgroundColor={'#000'} title={successText} onPress={onSuccess}/>
-            { onCancel && <Button color={'#000'} backgroundColor={'#000'} title="Cancel" onPress={onCancel}/> }
+            <TouchableOpacity style={styles.successBtn} onPress={onSuccess}><Text style={styles.successTxt}>{successText}</Text></TouchableOpacity>
+            {onCancel && <TouchableOpacity style={styles.cancelBtn} onPress={onCancel}><Text style={styles.cancelTxt}>Cancel</Text></TouchableOpacity>}
           </View>
         </View>
       </View>
@@ -49,6 +48,26 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
+  },
+  successBtn: {
+    backgroundColor: '#ffffff',
+    paddingVertical:8,
+    paddingHorizontal:16,
+    borderRadius:8
+  },
+  cancelBtn: {
+    backgroundColor: '#ffffff',
+    paddingVertical:8,
+    paddingHorizontal:16,
+    borderRadius:8
+  },
+  successTxt: {
+    color:'#000',
+    fontWeight:'500'
+  }, 
+  cancelTxt: {
+    color:'#000',
+    fontWeight:'500'
   }
   
 });

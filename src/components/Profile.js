@@ -1,15 +1,12 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator} from 'react-native'
 
 import { useEffect, useState } from 'react';
 import axiosInstance from '../config/axiosConfig';
-import { IP_ADDRESS, PORT } from '../constants';
 import BottomNavigation from './BottomNavigation';
-import { logout } from '../utils/Functions';
+import { getRandomUUID, logout } from '../utils/Functions';
 
 
 export default function Profile({navigation}){
-    const [token, setToken] = useState('');
     const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -104,14 +101,14 @@ export default function Profile({navigation}){
                             <Text style={styles.countsText}>{postCount}</Text>
                             <Text style={styles.countsDescription}>Posts</Text>
                         </View>
-                        <View style={styles.countsBox}>
+                        <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowerList', {key: getRandomUUID(), username})}}>
                             <Text style={styles.countsText}>{followerCount}</Text>
                             <Text style={styles.countsDescription}>Followers</Text>
-                        </View>
-                        <View style={styles.countsBox}>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowingList', {key: getRandomUUID(), username})}}>
                             <Text style={styles.countsText}>{followingCount}</Text>
                             <Text style={styles.countsDescription}>Following</Text>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.profileSubBx2}>

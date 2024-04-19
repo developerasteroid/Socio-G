@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, StatusBar, ActivityIndicator, Image, TouchableO
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../config/axiosConfig";
 import BottomNavigation from "./BottomNavigation";
+import { getRandomUUID } from "../utils/Functions";
 
 export default function FindUsers({navigation}){
     const [selfUID, setSelfUID] = useState(null);
@@ -153,8 +154,7 @@ export default function FindUsers({navigation}){
                 setRecentSearchUserID([uid, ...recentSearchUserID]);
             }
         }
-        
-        navigation.navigate('UserProfile', {uid})
+        navigation.push('UserProfile', {key: getRandomUUID(), uid});
     }
 
     const renderUsers = ({item}) => {

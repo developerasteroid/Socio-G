@@ -15,6 +15,8 @@ import AuthVerify from './src/verification/AuthVerify';
 import EditProfile from './src/components/EditProfile';
 import FindUsers from './src/components/FindUsers';
 import UserProfile from './src/components/UserProfile';
+import FollowingList from './src/components/FollowingList';
+import FollowerList from './src/components/FollowerList';
 
 
 
@@ -66,6 +68,8 @@ export default function App() {
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}}/>
         <Stack.Screen name="FindUser" component={FindUsers} options={{headerShown:false}}/>
         <Stack.Screen name='UserProfile' component={UserProfile} options={{headerShown:false}}/>
+        <Stack.Screen name='FollowingList' component={FollowingList} options={{headerShown:false}}/>
+        <Stack.Screen name='FollowerList' component={FollowerList} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

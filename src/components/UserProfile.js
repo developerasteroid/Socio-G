@@ -4,6 +4,7 @@ import { reset } from '../utils/NavigationUtils';
 import { useEffect, useState } from 'react';
 import axiosInstance from '../config/axiosConfig';
 import CustomAlert from './CustomAlert';
+import { getRandomUUID, selfUID } from '../utils/Functions';
 
 
 export default function UserProfile({navigation, route}){
@@ -45,7 +46,6 @@ export default function UserProfile({navigation, route}){
 
     const [followBtnClicked, setFollowBtnClicked] = useState(false);
     const [customAlertVisible, setCustomAlertVisible] = useState(false);
-    let promptComponent = customAlertVisible ? <CustomAlert visible={customAlertVisible} message={`If you want to follow again, you'll have to request to follow ${username} again.`} onCancel={()=>{setCustomAlertVisible(false); setFollowBtnClicked(false)}} onSuccess={()=>{setCustomAlertVisible(false); unfollowUser()}} successText='Unfollow'/> : null;
     
 
 
@@ -83,7 +83,15 @@ export default function UserProfile({navigation, route}){
         }
     }
 
-    const init = () => {
+    const checkUserIsSelf = async() => {
+        const selfID = await selfUID();
+        if(selfID == uid){
+            navigation.replace('Profile');
+        }
+    }
+
+    const init = async() => {
+        await checkUserIsSelf();
         getData();
     }
         
@@ -138,6 +146,7 @@ export default function UserProfile({navigation, route}){
             }
         } catch (error){
             if(error.response && error.response.data && error.response.data.message){
+                getData();
                 alert(error.response.data.message);
             } else {
                 alert(error.message);
@@ -187,7 +196,7 @@ export default function UserProfile({navigation, route}){
     return(
         <>
         <View style={styles.mainContainer}>
-            {promptComponent}
+        <CustomAlert visible={customAlertVisible} message={`If you want to follow again, you'll have to request to follow ${username} again.`} onCancel={()=>{setCustomAlertVisible(false); setFollowBtnClicked(false)}} onSuccess={()=>{setCustomAlertVisible(false); unfollowUser()}} successText='Unfollow'/>
             <View style={styles.topBox}>
                 <View style={{flexDirection:'row', alignItems:'center'}}>
                 <TouchableOpacity onPress={()=>{navigation.goBack()}}>
@@ -220,14 +229,14 @@ export default function UserProfile({navigation, route}){
                             <Text style={styles.countsText}>{postCount}</Text>
                             <Text style={styles.countsDescription}>Posts</Text>
                         </View>
-                        <View style={styles.countsBox}>
+                        <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowerList', {key: getRandomUUID(), username, uid})}}>
                             <Text style={styles.countsText}>{followerCount}</Text>
                             <Text style={styles.countsDescription}>Followers</Text>
-                        </View>
-                        <View style={styles.countsBox}>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowingList', {key: getRandomUUID(), username, uid})}}>
                             <Text style={styles.countsText}>{followingCount}</Text>
                             <Text style={styles.countsDescription}>Following</Text>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.profileSubBx2}>
