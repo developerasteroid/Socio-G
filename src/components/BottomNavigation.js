@@ -32,7 +32,7 @@ export default function BottomNavigation({activePage, componentHightSetter}){
                 style={styles.navIcons}
                 />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navBtns}>
+            <TouchableOpacity style={styles.navBtns} onPress={()=>{activePage != 'addPost' ? navigate('addPost') : null}}>
                 <Image
                 source={require('./../../assets/nav-add-icon.png')}
                 style={styles.addIcon}
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     mainContainer:{
         borderTopColor:'#222',
         borderTopWidth:0.5,
-        backgroundColor:'#000000',
+        backgroundColor:'#000',
         position:'absolute',
         left:0,
         right:0,

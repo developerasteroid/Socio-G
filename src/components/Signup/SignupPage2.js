@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {Text, View, StyleSheet, TouchableOpacity, TextInput, ImageBackground, ActivityIndicator, useColorScheme, Image, StatusBar, KeyboardAvoidingView, ScrollView, Alert, Platform} from 'react-native';
 import { IP_ADDRESS, PORT } from '../../constants';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupPage2({navigation, route}){
     const isDarkMode = useColorScheme() === 'dark';
@@ -166,6 +167,15 @@ export default function SignupPage2({navigation, route}){
             const result = await axiosInstance.post('/api/auth/register', values);
             if(result.status === 201){
                 if(result.data.message){
+                    try {
+                        const response = await axiosInstance.post('/api/auth/login', {username:username.toLowerCase(), password:password});
+                        if(response.status === 200){
+                            if(response.data && response.data.token && response.data.uid){
+                                 await AsyncStorage.setItem('token', response.data.token);
+                                 await AsyncStorage.setItem('uid', response.data.uid);  
+                            }
+                        }
+                    } catch (error) {}
                     navigation.reset({
                         index: 0,
                         routes: [{ 

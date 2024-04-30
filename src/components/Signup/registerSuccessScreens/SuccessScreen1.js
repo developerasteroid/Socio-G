@@ -36,7 +36,7 @@ export default function SuccessScreen1({navigation, route}){
 
             <View style={styles.nxtCntn}>
 
-                <TouchableOpacity style={styles.nxtbtnImg}>
+                <TouchableOpacity style={styles.nxtbtnImg} onPress={()=>{navigation.navigate('SuccessScreen2')}}>
                     <Image
                         style={styles.nxtbtnImg}
                         source={require('./../../../../assets/right-arrow-icon.png')}

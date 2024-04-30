@@ -5,7 +5,7 @@ import Profile from './src/components/Profile';
 import Home from './src/components/Home';
 import Login from './src/components/Login';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import SignupPage1 from './src/components/Signup/SignupPage1';
 import SignupPage2 from './src/components/Signup/SignupPage2';
 import PlatformIndependentDatePicker from './src/components/DatePick';
@@ -17,6 +17,7 @@ import FindUsers from './src/components/FindUsers';
 import UserProfile from './src/components/UserProfile';
 import FollowingList from './src/components/FollowingList';
 import FollowerList from './src/components/FollowerList';
+import AddPost from './src/components/AddPost';
 
 
 
@@ -63,13 +64,14 @@ export default function App() {
         <Stack.Screen name="Signup" component={SignupPage1} options={{headerShown:false}}/>
         <Stack.Screen name="SignupNext" component={SignupPage2} options={{headerShown:false}}/>
         <Stack.Screen name="SuccessScreen1" component={SuccessScreen1} options={{headerShown:false}}/>
-        <Stack.Screen name="SuccessScreen2" component={SuccessScreen2} options={{headerShown:false}}/>
+        <Stack.Screen name="SuccessScreen2" component={SuccessScreen2} options={{headerShown:false, ...TransitionPresets.SlideFromRightIOS, animationEnabled:true}}/>
         <Stack.Screen name="Profile" component={Profile} options={{headerShown:false}}/>
         <Stack.Screen name="EditProfile" component={EditProfile} options={{headerShown:false}}/>
         <Stack.Screen name="FindUser" component={FindUsers} options={{headerShown:false}}/>
         <Stack.Screen name='UserProfile' component={UserProfile} options={{headerShown:false}}/>
         <Stack.Screen name='FollowingList' component={FollowingList} options={{headerShown:false}}/>
         <Stack.Screen name='FollowerList' component={FollowerList} options={{headerShown:false}}/>
+        <Stack.Screen name='addPost' component={AddPost} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
