@@ -2,8 +2,6 @@ import { View, StyleSheet, StatusBar, Text, Alert, Linking, TouchableOpacity, Im
 import * as ExpoLocation from 'expo-location';
 import { useState, useEffect } from "react";
 import axiosInstance from "../config/axiosConfig";
-import { selfUID } from "../utils/Functions";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function ShareLocation({navigation}) {
@@ -133,8 +131,6 @@ export default function ShareLocation({navigation}) {
     }
 
 
-
-
     const getBitmojis = async() => {
         setFetchError('');
         setIsDataLoaded(false);
@@ -158,6 +154,15 @@ export default function ShareLocation({navigation}) {
         }
     }
 
+    const initialize = async() => {
+        getMyLocation();
+        let result = await getBitmojis();
+    }
+
+    useEffect(()=>{
+        initialize();
+    },[]);
+
     const dataLoadingAnimation = () => {
         return(
             <View style={styles.loadingContainer}>
@@ -176,22 +181,7 @@ export default function ShareLocation({navigation}) {
         );
     }
 
-    const initialize = async() => {
-        getMyLocation();
-        let result = await getBitmojis();
-        if(!result){
-            return;
-        }
-        
-    }
-
-
-
     
-    useEffect(()=>{
-        initialize();
-    },[]);
-
     const searchUsers = async(text) => {
         setFetchUserError('');
         if(!text){
