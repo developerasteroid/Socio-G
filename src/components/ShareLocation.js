@@ -224,7 +224,7 @@ export default function ShareLocation({navigation}) {
                 gap={5}
                 renderItem={({item})=>
                     (
-                        <TouchableOpacity activeOpacity={0.6} style={{margin:5}} onPress={()=>{setSelectedBitmoji(item._id)}}>
+                        <TouchableOpacity activeOpacity={0.7} style={{margin:5}} onPress={()=>{setSelectedBitmoji(item._id)}}>
                             <View style={styles.bitmojiBx}>
                                 <Image
                                     source={{uri: item.photo}}
@@ -286,7 +286,7 @@ export default function ShareLocation({navigation}) {
         return(
             <TouchableOpacity 
             activeOpacity={1} 
-            style={[styles.userContainer,{backgroundColor: (isActive ? '#048911': null)}]} 
+            style={[styles.userContainer,{backgroundColor: (isActive ? '#333': null)}]} 
             onPress={()=>{
                 if(isActive){
                     const updatedArray = shareWith.filter(id => id !== item.uid);
@@ -304,6 +304,17 @@ export default function ShareLocation({navigation}) {
                     <View style={styles.detailsContainer}>
                         <Text style={{color:'#fff'}}>{item.username}{item.isVerified && <Image source={require('./../../assets/verified-icon.png')} style={{width:20, height:20}}/>}</Text>
                         <Text style={{color:'#fff'}}>{item.name}</Text>
+                    </View>
+                    <View style={{flex: 1, justifyContent:'center', alignItems:'flex-end'}}>  
+                        <View style={styles.userCheckBx}>
+                            {
+                            isActive && 
+                            <Image
+                             source={require('./../../assets/check-box-icon.png')}
+                             style={{width:'100%', height:'100%'}}
+                            />
+                            }
+                        </View>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -466,5 +477,13 @@ const styles = StyleSheet.create({
     errorMsg: {
         color:'#f00',
         paddingHorizontal:20
+    },
+    userCheckBx:{
+        width:15, 
+        height:15, 
+        borderColor:'#777', 
+        borderWidth:1, 
+        borderRadius:7.5, 
+        overflow:'hidden'
     }
 });
