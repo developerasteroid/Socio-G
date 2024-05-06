@@ -38,9 +38,9 @@ export default function BottomNavigation({activePage, componentHightSetter}){
                 style={styles.addIcon}
                 />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.navBtns}>
+            <TouchableOpacity style={styles.navBtns} onPress={()=>{activePage != 'location' ? navigate('location') : null}}>
                 <Image
-                source={require('./../../assets/nav-reel-icon.png')}
+                source={require('./../../assets/nav-location-icon.png')}
                 style={styles.navIcons}
                 />
             </TouchableOpacity>

@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     },
     blackShadowBox:{
         backgroundColor:'#000',
-        opacity:0.35,
+        opacity:0.65,
         position:'absolute',
         top:0,
         left:0,

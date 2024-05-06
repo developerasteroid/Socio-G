@@ -18,6 +18,8 @@ import UserProfile from './src/components/UserProfile';
 import FollowingList from './src/components/FollowingList';
 import FollowerList from './src/components/FollowerList';
 import AddPost from './src/components/AddPost';
+import Location from './src/components/Location';
+import ShareLocation from './src/components/ShareLocation';
 
 
 
@@ -72,6 +74,9 @@ export default function App() {
         <Stack.Screen name='FollowingList' component={FollowingList} options={{headerShown:false}}/>
         <Stack.Screen name='FollowerList' component={FollowerList} options={{headerShown:false}}/>
         <Stack.Screen name='addPost' component={AddPost} options={{headerShown:false}}/>
+        <Stack.Screen name='location' component={Location} options={{headerShown:false}}/>
+        <Stack.Screen name='shareLocation' component={ShareLocation} options={{headerShown:false}}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );
