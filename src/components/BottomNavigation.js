@@ -20,7 +20,7 @@ export default function BottomNavigation({activePage, componentHightSetter}){
     
     return(
         <View style={[styles.mainContainer, {paddingBottom: containerBottomPadding}]} onLayout={handleLayout}>
-            <TouchableOpacity style={styles.navBtns}>
+            <TouchableOpacity style={styles.navBtns} onPress={()=>{activePage != 'home' ? navigate('home') : null}}>
                 <Image
                 source={require('./../../assets/nav-home-icon.png')}
                 style={styles.navIcons}

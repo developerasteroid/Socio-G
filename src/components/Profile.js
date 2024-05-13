@@ -80,7 +80,7 @@ export default function Profile({navigation}){
             <View style={styles.topBox}>
                 <Text style={styles.username}>{username}</Text>
                 <View>
-                    <TouchableOpacity onPress={async()=>{await logout();}}>
+                    <TouchableOpacity onPress={async()=>{ navigation.navigate('menu')}}>
                     <Image
                     style={styles.menu_icon}
                     source={require('../../assets/menu-icon.png')}

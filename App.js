@@ -20,6 +20,8 @@ import FollowerList from './src/components/FollowerList';
 import AddPost from './src/components/AddPost';
 import Location from './src/components/Location';
 import ShareLocation from './src/components/ShareLocation';
+import MenuPage from './src/components/MenuPage';
+import CommentPage from './src/components/CommentPage';
 
 
 
@@ -64,6 +66,7 @@ export default function App() {
         <Stack.Screen name="DatePicker" component={PlatformIndependentDatePicker} options={{headerShown:false}}/>
         <Stack.Screen name="Login" component={Login} options={{headerShown:false}}/>
         <Stack.Screen name="Signup" component={SignupPage1} options={{headerShown:false}}/>
+        <Stack.Screen name="home" component={Home} options={{headerShown:false}}/>
         <Stack.Screen name="SignupNext" component={SignupPage2} options={{headerShown:false}}/>
         <Stack.Screen name="SuccessScreen1" component={SuccessScreen1} options={{headerShown:false}}/>
         <Stack.Screen name="SuccessScreen2" component={SuccessScreen2} options={{headerShown:false, ...TransitionPresets.SlideFromRightIOS, animationEnabled:true}}/>
@@ -76,6 +79,10 @@ export default function App() {
         <Stack.Screen name='addPost' component={AddPost} options={{headerShown:false}}/>
         <Stack.Screen name='location' component={Location} options={{headerShown:false}}/>
         <Stack.Screen name='shareLocation' component={ShareLocation} options={{headerShown:false}}/>
+        <Stack.Screen name='menu' component={MenuPage} options={{headerShown:false}}/>
+        <Stack.Screen name='comment' component={CommentPage} options={{headerShown:false}}/>
+
+
 
       </Stack.Navigator>
     </NavigationContainer>

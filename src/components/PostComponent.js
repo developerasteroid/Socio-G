@@ -1,90 +1,14 @@
-import {View, StyleSheet, Text, SafeAreaView, TouchableOpacity, Image, FlatList, RefreshControl, Dimensions, StatusBar} from 'react-native'
-import { useState, useEffect, useRef } from 'react'
-import { IP_ADDRESS, PORT } from '../constants';
+import { Image, Text, TouchableOpacity, View, StyleSheet, StatusBar } from 'react-native';
 import axiosInstance from '../config/axiosConfig';
-import BottomNavigation from './BottomNavigation';
-import PostComponent from './PostComponent';
+import { useState } from 'react';
+import { navigate } from '../utils/NavigationUtils';
 
-
-
-export default function Home(){
-    const [isRefresh, setIsRefresh] = useState(false);
-    const [fetchError, setFetchError] = useState(false);
-    const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
-
-
-    const [postData, setPostData] = useState([]);
-    
-    const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
-
+export default function PostComponent({item, postData, setPostData, screenWidth}){
     let unlikedImg = require('../../assets/unlike-icon.png');
     let likedImg = require('../../assets/liked-icon.png');
     let commentImg = require('../../assets/comment-icon.png');
-    let sendImg = require('../../assets/send-icon.png');
-
-    // useEffect(() => {
-    //     const updateScreenWidth = () => {
-    //       setScreenWidth(Dimensions.get('window').width);
-    //     };
-        
-    
-    //     Dimensions.addEventListener('change', updateScreenWidth);
-    
-    //     // Clean up event listener on component unmount
-    //     return () => {
-    //       Dimensions.removeEventListener('change', updateScreenWidth);
-    //     };
-    //   }, []);
-
-
-
-
-    
-
-    const fetchData = async() =>{
-        setIsRefresh(true);
-        try{
-            const response = await axiosInstance.get('api/post/serve');
-            
-            
-            if(response.status == 200){
-                let postArray = response.data;
-                setPostData(postArray);
-                setFetchError(false);
-            } else {
-                setFetchError(true);
-            }
-        } catch(e){
-            setFetchError(true);
-        }
-        
-        // console.log(screenWidth)
-        // setTimeout(()=>{setIsRefresh(false)}, 3000)
-        setIsRefresh(false);
-    }
-    useEffect(() => {fetchData()}, []);
-
-
-
-    const renderFeedFooter = () => {
-        return (
-            <>
-            {fetchError && (<View style={styles.errorContainer}>
-                <Text style={styles.fetchErrorTxt}>! Something went wrong.</Text>
-                <Image
-                source={require('../../assets/crying.png')}
-                style={{width:80, height:80}}
-                />
-                </View>)}
-            </>
-        )
-    }
-
-    const renderFeed = ({item}) => {
-        return (
-            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} />
-        )
-        return(
+    let [menuActive, setmenuActive] = useState(false);
+    return(
         <View style={styles.feedCard}>
             <View style={styles.feedTopBx}>
             <Image
@@ -92,14 +16,38 @@ export default function Home(){
                 style={{width:32, height:32, borderRadius:20}}
             />
             <Text style={styles.feedUserName}>{item.name}</Text>
-            <View style={{flex:1, alignItems: 'flex-end', paddingHorizontal: 10}}>
-                <TouchableOpacity>
+            <View style={{flex:1, alignItems: 'flex-end', position:'relative', zIndex:99}}>
+                {/* <TouchableOpacity
+                    style={{paddingHorizontal:12, paddingVertical:8}}
+                    onPress={()=>{
+                        setmenuActive(!menuActive);
+                    }}
+                >
                 <Image
                  source={require('./../../assets/dot-menu-icon.png')}
                  style={{tintColor:'#ffffff', width:18, height:18}}
                  />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                
             </View>
+                {
+                    menuActive &&
+                    <View style={{backgroundColor:'#000000', position:'absolute', top:'100%', right:0, zIndex:99}}>
+                        <TouchableOpacity>
+                        <Text 
+                        style={
+                            {
+                                color:'#ffffff',
+                                paddingVertical:8,
+                                paddingHorizontal:25,
+                                fontSize:16
+                            }
+                        }>
+                            Report post
+                        </Text>
+                        </TouchableOpacity>
+                    </View>
+                 }
             </View>
             {
                 item.category == "video" ? 
@@ -172,10 +120,15 @@ export default function Home(){
                     style={[item.liked ? {} : styles.bottomIconClr, styles.bottomIconSize]}
                     />
                 </TouchableOpacity>
-                <Image 
-                source={commentImg}
-                style={[styles.bottomIconClr, styles.bottomIconSize]}
-                />
+                <TouchableOpacity onPress={()=>{
+                    navigate('comment', {pid: item._id});
+                }}>
+                    <Image 
+                    source={commentImg}
+                    style={[styles.bottomIconClr, styles.bottomIconSize]}
+                    />
+                </TouchableOpacity>
+
                 {/* <Image 
                 source={sendImg}
                 style={[styles.bottomIconClr, styles.bottomIconSize]}
@@ -185,36 +138,7 @@ export default function Home(){
                 <Text style={styles.postedDate}>{item.date}</Text>
             </View>
         </View>
-    )}
-
-    return(
-        <View style={[styles.mainContainer, {paddingBottom: bottomNavigationHeight}]}>
-        <View style={styles.topNavBox}>
-            <Text style={styles.appTitleTxt}>Socio-G</Text>
-            {/* <TouchableOpacity style={styles.notifyBtnTouch}>
-                <Image
-                style={styles.notify_icon}
-                source={require('../../assets/notification-icon.png')}
-                />
-                <View style={styles.notifyCountBx}><Text style={styles.notifyCountTxt}>99</Text></View>
-            </TouchableOpacity> */}
-        </View>
-        <View style={styles.feedBox}>
-            <FlatList
-                data={postData}
-                renderItem={renderFeed}
-                refreshControl={
-                    <RefreshControl
-                    refreshing={isRefresh}
-                    onRefresh={fetchData}
-                    />
-                }
-                ListFooterComponent={renderFeedFooter}
-            />
-        </View>
-        <BottomNavigation componentHightSetter={setBottomNavigationHeight}/>
-        </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
