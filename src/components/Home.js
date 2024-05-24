@@ -7,7 +7,7 @@ import PostComponent from './PostComponent';
 
 
 
-export default function Home(){
+export default function Home({navigation}){
     const [isRefresh, setIsRefresh] = useState(false);
     const [fetchError, setFetchError] = useState(false);
     const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
@@ -191,13 +191,13 @@ export default function Home(){
         <View style={[styles.mainContainer, {paddingBottom: bottomNavigationHeight}]}>
         <View style={styles.topNavBox}>
             <Text style={styles.appTitleTxt}>Socio-G</Text>
-            {/* <TouchableOpacity style={styles.notifyBtnTouch}>
+            <TouchableOpacity style={styles.notifyBtnTouch} onPress={() => navigation.navigate('aiChatHome')}>
                 <Image
-                style={styles.notify_icon}
-                source={require('../../assets/notification-icon.png')}
+                style={styles.aiChatIcon}
+                source={require('../../assets/ai-chat-icon.png')}
                 />
-                <View style={styles.notifyCountBx}><Text style={styles.notifyCountTxt}>99</Text></View>
-            </TouchableOpacity> */}
+                {/* <View style={styles.notifyCountBx}><Text style={styles.notifyCountTxt}>99</Text></View> */}
+            </TouchableOpacity>
         </View>
         <View style={styles.feedBox}>
             <FlatList
@@ -245,6 +245,10 @@ const styles = StyleSheet.create({
         tintColor:'#fff',
         width:26,
         height:26
+    },
+    aiChatIcon: {
+        width:30,
+        height:30
     },
     notifyCountBx:{
         position:'absolute',

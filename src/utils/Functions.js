@@ -25,3 +25,34 @@ export const getRandomUUID = () => {
       return null;
     }
   };
+
+export const storeDataWithExpiry = async (key, value, ttl = 86400000) => { // ttl in milliseconds, 24 hours = 86400000 ms
+  try {
+    const now = new Date().getTime();
+    const expiry = now + ttl;
+    const data = { value, expiry };
+    const jsonValue = JSON.stringify(data);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {
+    console.error('Error storing data with expiry', e);
+  }
+};
+
+export const getDataWithExpiry = async (key) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+    if (jsonValue != null) {
+      const data = JSON.parse(jsonValue);
+      const now = new Date().getTime();
+      if (now < data.expiry) {
+        return data.value;
+      } else {
+        await AsyncStorage.removeItem(key); // Data expired, remove it
+        return null;
+      }
+    }
+    return null;
+  } catch (e) {
+    console.error('Error retrieving data with expiry', e);
+  }
+};

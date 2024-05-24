@@ -22,6 +22,8 @@ import Location from './src/components/Location';
 import ShareLocation from './src/components/ShareLocation';
 import MenuPage from './src/components/MenuPage';
 import CommentPage from './src/components/CommentPage';
+import AiChatHome from './src/components/AiChatHome';
+import AiChatScreen from './src/components/AiChatScreen';
 
 
 
@@ -81,6 +83,11 @@ export default function App() {
         <Stack.Screen name='shareLocation' component={ShareLocation} options={{headerShown:false}}/>
         <Stack.Screen name='menu' component={MenuPage} options={{headerShown:false}}/>
         <Stack.Screen name='comment' component={CommentPage} options={{headerShown:false}}/>
+        <Stack.Screen name='aiChatHome' component={AiChatHome} options={{headerShown:false}}/>
+        <Stack.Screen name='aiChatScreen' component={AiChatScreen} options={{headerShown:false}}/>
+
+        
+
 
 
 
