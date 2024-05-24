@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator, Alert} from 'react-native'
+import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator, Alert, Dimensions, FlatList, RefreshControl} from 'react-native'
 import { reset } from '../utils/NavigationUtils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axiosInstance from '../config/axiosConfig';
 import CustomAlert from './CustomAlert';
 import { getRandomUUID, selfUID } from '../utils/Functions';
+import PostComponent from './PostComponent';
 
 
 export default function UserProfile({navigation, route}){
@@ -46,11 +47,23 @@ export default function UserProfile({navigation, route}){
 
     const [followBtnClicked, setFollowBtnClicked] = useState(false);
     const [customAlertVisible, setCustomAlertVisible] = useState(false);
+
+    //post
+    const [postData, setPostData] = useState([]);
+    const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
+    const [postFetchError, setPostFetchError] = useState(null);
+
+    //for video posts
+    const [VisibleItem, setVisibleItem] = useState('');
+    const [isMuted, setIsMuted] = useState(true);
+    const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+    //post end
     
 
 
 
     const getData = async() => {
+        setIsLoading(true);
         try {
             const result = await axiosInstance.get(`api/user/profile/${uid}`);
             if(result.status === 200 && result.data){
@@ -83,6 +96,27 @@ export default function UserProfile({navigation, route}){
         }
     }
 
+    const fetchData = async() =>{
+        setIsPostDataLoaded(false);
+        setPostFetchError(null);
+        try{
+            const response = await axiosInstance.get('api/post/serve/' + uid);
+            if(response.status == 200){
+                let postArray = response.data;
+                setPostData(postArray);
+                setIsPostDataLoaded(true);
+            } else {
+                setPostFetchError('Not able to fetch posts');
+            }
+        } catch(error){
+            if(error.response && error.response.data && error.response.data.message){
+                setPostFetchError(error.response.data.message);
+            } else {
+                setPostFetchError(error.message);
+            }
+        }
+    }
+
     const checkUserIsSelf = async() => {
         const selfID = await selfUID();
         if(selfID == uid){
@@ -93,12 +127,27 @@ export default function UserProfile({navigation, route}){
     const init = async() => {
         await checkUserIsSelf();
         getData();
+        fetchData();
     }
         
 
     useEffect(()=>{
         init();
     }, []);
+
+    const _onViewableItemsChanged = useCallback(({ viewableItems, changed }) => {
+        if(viewableItems.length > 0){
+            setVisibleItem(viewableItems[0].item._id);
+        } else {
+            setVisibleItem('');
+        }
+    }, []);
+
+    const _viewabilityConfig = {
+        itemVisiblePercentThreshold: 80
+    }
+
+
 
     const unfollowUser = async() => {
         try {
@@ -193,29 +242,8 @@ export default function UserProfile({navigation, route}){
 
 
 
-    return(
-        <>
-        <View style={styles.mainContainer}>
-        <CustomAlert visible={customAlertVisible} message={`If you want to follow again, you'll have to request to follow ${username} again.`} onCancel={()=>{setCustomAlertVisible(false); setFollowBtnClicked(false)}} onSuccess={()=>{setCustomAlertVisible(false); unfollowUser()}} successText='Unfollow'/>
-            <View style={styles.topBox}>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                <TouchableOpacity onPress={()=>{navigation.goBack()}}>
-                    <Image
-                    source={require('./../../assets/left-back-icon.png')}
-                    style={styles.backBtnIcon}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.username}>{username}</Text>
-                </View>
-                <View>
-                    <TouchableOpacity>
-                    <Image
-                    style={styles.menu_icon}
-                    source={require('../../assets/dot-menu-icon.png')}
-                    />
-                    </TouchableOpacity>
-                </View>
-            </View>
+    const renderHeaderComponent = () => {
+        return (
             <View style={styles.profileBox}>
                 <View style={styles.profileSubBx1}>
                     <View>
@@ -268,6 +296,80 @@ export default function UserProfile({navigation, route}){
                         />
                     </TouchableOpacity>
                 </View>
+            </View>
+        );
+    }
+
+    const renderPostsEmpty = () => {
+        if(isPostDataLoaded){
+            return (
+                <View style={{minHeight:250, justifyContent:'center', alignItems:'center'}}>
+                    <Text style={{color:'#aaaaaa', fontSize:32, fontWeight:'500'}}>0 Posts</Text>
+                </View>
+            )
+        } else if(postFetchError) {
+            return (
+                <View style={{minHeight:250, justifyContent:'center', alignItems:'center'}}>
+                    <Text style={{color:'#aaaaaa', fontSize:16}}>{postFetchError}</Text>
+                </View>
+            )
+        } else {
+            return (
+                <View style={{minHeight:250, justifyContent:'center', alignItems:'center'}}>
+                    <ActivityIndicator size='large' color='#ffffff'/>
+                </View>
+            )
+        }
+    }
+
+
+
+    return(
+        <>
+        <View style={styles.mainContainer}>
+        <CustomAlert visible={customAlertVisible} message={`If you want to follow again, you'll have to request to follow ${username} again.`} onCancel={()=>{setCustomAlertVisible(false); setFollowBtnClicked(false)}} onSuccess={()=>{setCustomAlertVisible(false); unfollowUser()}} successText='Unfollow'/>
+            <View style={styles.topBox}>
+                <View style={{flexDirection:'row', alignItems:'center'}}>
+                <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+                    <Image
+                    source={require('./../../assets/left-back-icon.png')}
+                    style={styles.backBtnIcon}
+                    />
+                </TouchableOpacity>
+                <Text style={styles.username}>{username}</Text>
+                </View>
+                <View>
+                    <TouchableOpacity>
+                    <Image
+                    style={styles.menu_icon}
+                    source={require('../../assets/dot-menu-icon.png')}
+                    />
+                    </TouchableOpacity>
+                </View>
+            </View>
+            
+
+            <View>
+                <FlatList
+                    data={postData}
+                    ListHeaderComponent={renderHeaderComponent}
+                    renderItem={({item}) => {
+                        return (
+                            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="report" menuCallback={() => {console.log('report');}}/>
+                        )
+                    }}
+                    ListEmptyComponent={renderPostsEmpty}
+                    refreshControl={
+                        <RefreshControl
+                        refreshing={isLoading}
+                        onRefresh={init}
+                        
+                        />
+                    }
+                    onViewableItemsChanged={_onViewableItemsChanged}
+                    viewabilityConfig={_viewabilityConfig}
+                    ListFooterComponent={() => (<View style={{height:50}}></View>)}
+                />
             </View>
         </View>
         </>

@@ -1,9 +1,10 @@
-import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator} from 'react-native'
+import {Text, StyleSheet, View, Image, TouchableOpacity, SafeAreaView, Platform, StatusBar, ActivityIndicator, ScrollView, FlatList, Dimensions, RefreshControl, Alert} from 'react-native'
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axiosInstance from '../config/axiosConfig';
 import BottomNavigation from './BottomNavigation';
-import { getRandomUUID, logout } from '../utils/Functions';
+import { getRandomUUID, selfUID } from '../utils/Functions';
+import PostComponent from './PostComponent';
 
 
 export default function Profile({navigation}){
@@ -22,8 +23,20 @@ export default function Profile({navigation}){
     const [followerCount, setFollowerCount] = useState('0');
     const [followingCount, setFollowingCount] = useState('0');
 
+    //post
+    const [postData, setPostData] = useState([]);
+    const [isPostDataLoaded, setIsPostDataLoaded] = useState(false);
+    const [postFetchError, setPostFetchError] = useState(null);
+
+    //for video posts
+    const [VisibleItem, setVisibleItem] = useState('');
+    const [isMuted, setIsMuted] = useState(true);
+    const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+
+
     const getData = async() => {
         // setToken(await AsyncStorage.getItem('token'));
+        setIsLoading(true);
         try {
             const result = await axiosInstance.get('api/user/profile/');
             if(result.status === 200 && result.data){
@@ -52,11 +65,86 @@ export default function Profile({navigation}){
             }
         }
     }
+
+    const fetchData = async() =>{
+        setIsPostDataLoaded(false);
+        setPostFetchError(null);
+        try{
+            const selfid = await selfUID();
+            const response = await axiosInstance.get('api/post/serve/' + selfid);
+            if(response.status == 200){
+                let postArray = response.data;
+                setPostData(postArray);
+                setIsPostDataLoaded(true);
+            } else {
+                setPostFetchError('Not able to fetch posts');
+            }
+        } catch(error){
+            if(error.response && error.response.data && error.response.data.message){
+                setPostFetchError(error.response.data.message);
+            } else {
+                setPostFetchError(error.message);
+            }
+        }
+    }
         
 
-    useEffect(()=>{
+    const initialFetch = () => {
         getData();
+        fetchData();
+    }
+    useEffect(()=>{
+        initialFetch();
     }, []);
+
+    const deletePost = async(postId) => {
+        try {
+            const response = axiosInstance.post('api/post/delete', {postId});
+            initialFetch();
+        } catch (error) {
+            if(error.response && error.response.data && error.response.data.message){
+                alert(error.response.data.message);
+            } else {
+                alert(error.message);
+            }
+        }
+    }
+    const deletePostHandler = (item) => {
+        if(item._id){
+            Alert.alert(
+                'Post Delete',
+                'Are you sure you want to delete this post?',
+                [
+                {
+                    text: 'Cancel',
+                    onPress: () => {
+                    // Handle cancel action if needed
+                    },
+                    style: 'cancel',
+                },
+                {
+                    text: 'Delete',
+                    onPress: () => {
+                        deletePost(item._id);
+                    },
+                },
+                ],
+                { cancelable: false }
+            );
+        }
+    }
+
+    const _onViewableItemsChanged = useCallback(({ viewableItems, changed }) => {
+        if(viewableItems.length > 0){
+            setVisibleItem(viewableItems[0].item._id);
+        } else {
+            setVisibleItem('');
+        }
+    }, []);
+
+    const _viewabilityConfig = {
+        itemVisiblePercentThreshold: 80
+    }
 
 
     if(!username){
@@ -73,6 +161,80 @@ export default function Profile({navigation}){
     }
 
 
+    const renderHeaderComponent = () => {
+        return (
+                <View style={styles.profileBox}>
+                    <View style={styles.profileSubBx1}>
+                        <View>
+                            <Image
+                            source={profileImgUri ? {uri: profileImgUri} : require('../../assets/profile-default.png')}
+                            style={styles.profileImg}
+                            />
+                        </View>
+                        <View style={styles.profileCountBoxSB}>
+                            <View style={styles.countsBox}>
+                                <Text style={styles.countsText}>{postCount}</Text>
+                                <Text style={styles.countsDescription}>Posts</Text>
+                            </View>
+                            <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowerList', {key: getRandomUUID(), username})}}>
+                                <Text style={styles.countsText}>{followerCount}</Text>
+                                <Text style={styles.countsDescription}>Followers</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowingList', {key: getRandomUUID(), username})}}>
+                                <Text style={styles.countsText}>{followingCount}</Text>
+                                <Text style={styles.countsDescription}>Following</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={styles.profileSubBx2}>
+                        <View style={styles.profileNameBox}>
+                            <Text style={styles.profileNameTxt}>{name}</Text>
+                            {isVerified &&
+                            <Image
+                            style={styles.verifiedIcon}
+                            source={require('../../assets/verified-icon.png')}
+                            />
+                            }
+                        </View>
+                        <Text style={styles.professionTxt}>{profession}</Text>
+                        <Text style={styles.bioTxt}>{bio}</Text>
+                    </View>
+                    <View>
+                        <TouchableOpacity style={styles.editProfileBtn} onPress={()=>{navigation.navigate('EditProfile')}}>
+                            <Text style={styles.editProfileTxt}>Edit profile</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+        );
+    }
+
+    const renderPostsEmpty = () => {
+        if(isPostDataLoaded){
+            return (
+                <View style={{minHeight:250, justifyContent:'center', alignItems:'center'}}>
+                    <Text style={{color:'#aaaaaa', fontSize:32, fontWeight:'500'}}>No Posts Yet</Text>
+                    <TouchableOpacity 
+                    style={{backgroundColor:'#555', paddingVertical:7, paddingHorizontal:16, borderRadius:30, marginTop: 15}}
+                    onPress={()=>{navigation.navigate('addPost')}}
+                    >
+                        <Text style={{color:'#efefef', fontSize:18, fontWeight:'600'}}>New Post</Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        } else if(postFetchError) {
+            return (
+                <View style={{minHeight:250, justifyContent:'center', alignItems:'center'}}>
+                    <Text style={{color:'#aaaaaa', fontSize:16}}>{postFetchError}</Text>
+                </View>
+            )
+        } else {
+            return (
+                <View style={{minHeight:250, justifyContent:'center', alignItems:'center'}}>
+                    <ActivityIndicator size='large' color='#ffffff'/>
+                </View>
+            )
+        }
+    }
 
     return(
         <>
@@ -88,48 +250,30 @@ export default function Profile({navigation}){
                     </TouchableOpacity>
                 </View>
             </View>
-            <View style={styles.profileBox}>
-                <View style={styles.profileSubBx1}>
-                    <View>
-                        <Image
-                        source={profileImgUri ? {uri: profileImgUri} : require('../../assets/profile-default.png')}
-                        style={styles.profileImg}
-                        />
-                    </View>
-                    <View style={styles.profileCountBoxSB}>
-                        <View style={styles.countsBox}>
-                            <Text style={styles.countsText}>{postCount}</Text>
-                            <Text style={styles.countsDescription}>Posts</Text>
-                        </View>
-                        <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowerList', {key: getRandomUUID(), username})}}>
-                            <Text style={styles.countsText}>{followerCount}</Text>
-                            <Text style={styles.countsDescription}>Followers</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.countsBox} onPress={()=>{navigation.push('FollowingList', {key: getRandomUUID(), username})}}>
-                            <Text style={styles.countsText}>{followingCount}</Text>
-                            <Text style={styles.countsDescription}>Following</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.profileSubBx2}>
-                    <View style={styles.profileNameBox}>
-                        <Text style={styles.profileNameTxt}>{name}</Text>
-                        {isVerified &&
-                        <Image
-                        style={styles.verifiedIcon}
-                        source={require('../../assets/verified-icon.png')}
-                        />
-                        }
-                    </View>
-                    <Text style={styles.professionTxt}>{profession}</Text>
-                    <Text style={styles.bioTxt}>{bio}</Text>
-                </View>
+            
+                
                 <View>
-                    <TouchableOpacity style={styles.editProfileBtn} onPress={()=>{navigation.navigate('EditProfile')}}>
-                        <Text style={styles.editProfileTxt}>Edit profile</Text>
-                    </TouchableOpacity>
+                <FlatList
+                    data={postData}
+                    ListHeaderComponent={renderHeaderComponent}
+                    renderItem={({item}) => {
+                        return (
+                            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="delete" menuCallback={deletePostHandler}/>
+                        )
+                    }}
+                    ListEmptyComponent={renderPostsEmpty}
+                    refreshControl={
+                        <RefreshControl
+                        refreshing={isLoading}
+                        onRefresh={initialFetch}
+                        
+                        />
+                    }
+                    onViewableItemsChanged={_onViewableItemsChanged}
+                    viewabilityConfig={_viewabilityConfig}
+                    ListFooterComponent={() => (<View style={{height:50}}></View>)}
+                />
                 </View>
-            </View>
             <BottomNavigation componentHightSetter={setBottomNavigationHeight}/>
         </View>
         </>

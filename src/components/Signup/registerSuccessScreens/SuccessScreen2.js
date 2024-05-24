@@ -14,7 +14,7 @@ export default function SuccessScreen2({navigation}){
                     style={styles.getstrtdBtn} 
                     activeOpacity={0.7} 
                     onPress={()=>{
-                        reset('FindUser');
+                        reset('home');
                     }}
                     >
                     <Text style={styles.getstrtdBtnTxt}>Get Sarted</Text>

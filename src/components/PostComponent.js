@@ -1,13 +1,26 @@
 import { Image, Text, TouchableOpacity, View, StyleSheet, StatusBar } from 'react-native';
 import axiosInstance from '../config/axiosConfig';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { navigate } from '../utils/NavigationUtils';
+import { Video } from 'expo-av';
 
-export default function PostComponent({item, postData, setPostData, screenWidth}){
+export default function PostComponent({item, postData, setPostData, screenWidth, VisibleItemId, isMuted, setIsMuted, menuText = null, menuCallback = () => {}}){
     let unlikedImg = require('../../assets/unlike-icon.png');
     let likedImg = require('../../assets/liked-icon.png');
     let commentImg = require('../../assets/comment-icon.png');
-    let [menuActive, setmenuActive] = useState(false);
+    const [menuActive, setmenuActive] = useState(false);
+    const [pause, setPause] = useState(false);
+    const [videoMute, setVideoMute] = useState(true);
+    const [videoPlay, setVideoPlay] = useState(false);
+
+    useEffect(() => {
+        setVideoMute(() => (isMuted || VisibleItemId != item._id));
+    }, [VisibleItemId, isMuted]);
+
+    useEffect(() => {
+        setVideoPlay(() => (!pause && VisibleItemId == item._id));
+    }, [VisibleItemId, pause]);
+
     return(
         <View style={styles.feedCard}>
             <View style={styles.feedTopBx}>
@@ -17,23 +30,32 @@ export default function PostComponent({item, postData, setPostData, screenWidth}
             />
             <Text style={styles.feedUserName}>{item.name}</Text>
             <View style={{flex:1, alignItems: 'flex-end', position:'relative', zIndex:99}}>
-                {/* <TouchableOpacity
-                    style={{paddingHorizontal:12, paddingVertical:8}}
-                    onPress={()=>{
-                        setmenuActive(!menuActive);
-                    }}
-                >
-                <Image
-                 source={require('./../../assets/dot-menu-icon.png')}
-                 style={{tintColor:'#ffffff', width:18, height:18}}
-                 />
-                </TouchableOpacity> */}
+                {
+                    menuText 
+                    &&
+                    <TouchableOpacity
+                        style={{paddingHorizontal:12, paddingVertical:8}}
+                        onPress={()=>{
+                            setmenuActive(!menuActive);
+                        }}
+                    >
+                    <Image
+                    source={require('./../../assets/dot-menu-icon.png')}
+                    style={{tintColor:'#ffffff', width:18, height:18}}
+                    />
+                    </TouchableOpacity>
+                }
                 
             </View>
                 {
                     menuActive &&
-                    <View style={{backgroundColor:'#000000', position:'absolute', top:'100%', right:0, zIndex:99}}>
-                        <TouchableOpacity>
+                    <View style={{backgroundColor:'#000000', position:'absolute', top:'100%', right:0, zIndex:99, borderTopWidth:1, borderColor: '#1a1a1a', borderBottomWidth: 1}}>
+                        <TouchableOpacity 
+                        onPress={()=> {
+                            setmenuActive(false);
+                            menuCallback(item);
+                        }}
+                        >
                         <Text 
                         style={
                             {
@@ -43,7 +65,7 @@ export default function PostComponent({item, postData, setPostData, screenWidth}
                                 fontSize:16
                             }
                         }>
-                            Report post
+                            {menuText}
                         </Text>
                         </TouchableOpacity>
                     </View>
@@ -51,7 +73,26 @@ export default function PostComponent({item, postData, setPostData, screenWidth}
             </View>
             {
                 item.category == "video" ? 
-                null
+                (
+                    <TouchableOpacity activeOpacity={1} onPress={()=>{setPause((prev) => !prev)}}>
+                    <Video
+                    source={{uri: item.content}}
+                    style={{width:screenWidth, height:screenWidth, backgroundColor:'#000'}}
+                    resizeMode='contain'
+                    useNativeControls={false}
+                    shouldPlay={videoPlay}
+                    isLooping={true}
+                    isMuted={videoMute}
+                    />
+                    {
+                    pause && <Image 
+                    source={require('./../../assets/pause.png')}
+                    style={{ width:60, height:60, position:'absolute', top:'50%', left:'50%', transform:[{translateX:-30}, {translateY:-30}]}}
+                    />
+                    }
+                    <TouchableOpacity activeOpacity={0.8} style={{position:'absolute', bottom:5, right: 10, padding: 10}} onPress={()=>{setIsMuted((prev)=> !prev)}}><Image source={isMuted ? require('./../../assets/mute.png') : require('./../../assets/sound.png')} style={{width:23, height:23}}/></TouchableOpacity>
+                    </TouchableOpacity>
+                )
                 :
                 <Image 
                 source={{uri:item.content}}

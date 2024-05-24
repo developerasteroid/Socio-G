@@ -1,5 +1,5 @@
 import {View, StyleSheet, Text, SafeAreaView, TouchableOpacity, Image, FlatList, RefreshControl, Dimensions, StatusBar} from 'react-native'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { IP_ADDRESS, PORT } from '../constants';
 import axiosInstance from '../config/axiosConfig';
 import BottomNavigation from './BottomNavigation';
@@ -11,6 +11,9 @@ export default function Home({navigation}){
     const [isRefresh, setIsRefresh] = useState(false);
     const [fetchError, setFetchError] = useState(false);
     const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
+    //for video posts
+    const [VisibleItem, setVisibleItem] = useState('');
+    const [isMuted, setIsMuted] = useState(true);
 
 
     const [postData, setPostData] = useState([]);
@@ -82,110 +85,23 @@ export default function Home({navigation}){
 
     const renderFeed = ({item}) => {
         return (
-            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} />
+            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="check Report in props" menuCallback={(item)=>{console.log("Report");}}/>
         )
-        return(
-        <View style={styles.feedCard}>
-            <View style={styles.feedTopBx}>
-            <Image
-                source={{uri:item.profile}}
-                style={{width:32, height:32, borderRadius:20}}
-            />
-            <Text style={styles.feedUserName}>{item.name}</Text>
-            <View style={{flex:1, alignItems: 'flex-end', paddingHorizontal: 10}}>
-                <TouchableOpacity>
-                <Image
-                 source={require('./../../assets/dot-menu-icon.png')}
-                 style={{tintColor:'#ffffff', width:18, height:18}}
-                 />
-                </TouchableOpacity>
-            </View>
-            </View>
-            {
-                item.category == "video" ? 
-                null
-                :
-                <Image 
-                source={{uri:item.content}}
-                style={{width:screenWidth, height:(item.height / (item.width / screenWidth)), resizeMode:'contain'}}
-                />
-            }
-            <View style={styles.feedBottomBx}>
-                <View style={styles.like_cmt_shr_icn_container}>
-                <TouchableOpacity onPress={async()=>{
-                    if(!item.liked){
-                    try {
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = true;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
-                        const response = await axiosInstance.get(`api/post/like/${item._id}`)
-                    } catch (error) {
-                        console.log(error);
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = false;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
-                    }
-                } else {
-                    try {
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = false;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
-                        const response = await axiosInstance.get(`api/post/dislike/${item._id}`)
-                    } catch (error) {
-                        console.log(error);
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = true;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
-                    }
-                }
-                }}>
-                    <Image 
-                    source={item.liked? likedImg : unlikedImg}
-                    style={[item.liked ? {} : styles.bottomIconClr, styles.bottomIconSize]}
-                    />
-                </TouchableOpacity>
-                <Image 
-                source={commentImg}
-                style={[styles.bottomIconClr, styles.bottomIconSize]}
-                />
-                {/* <Image 
-                source={sendImg}
-                style={[styles.bottomIconClr, styles.bottomIconSize]}
-                /> */}
-                </View>
-                <Text style={[styles.captionTxt, item.caption == ""? {display:'none'}: {display:'flex'}]}><Text style={styles.unameCaption}>{item.name}</Text> {item.caption}</Text>
-                <Text style={styles.postedDate}>{item.date}</Text>
-            </View>
-        </View>
-    )}
+    }
+
+    
+
+    const _onViewableItemsChanged = useCallback(({ viewableItems, changed }) => {
+        if(viewableItems.length > 0){
+            setVisibleItem(viewableItems[0].item._id);
+        } else {
+            setVisibleItem('');
+        }
+    }, []);
+
+    const _viewabilityConfig = {
+        itemVisiblePercentThreshold: 80
+    }
 
     return(
         <View style={[styles.mainContainer, {paddingBottom: bottomNavigationHeight}]}>
@@ -203,10 +119,13 @@ export default function Home({navigation}){
             <FlatList
                 data={postData}
                 renderItem={renderFeed}
+                onViewableItemsChanged={_onViewableItemsChanged}
+                viewabilityConfig={_viewabilityConfig}
                 refreshControl={
                     <RefreshControl
                     refreshing={isRefresh}
                     onRefresh={fetchData}
+                    
                     />
                 }
                 ListFooterComponent={renderFeedFooter}

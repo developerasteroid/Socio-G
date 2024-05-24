@@ -16,7 +16,7 @@ export default function AuthVerify({navigation}){
             const response = await axiosInstance.get('/api/auth/');
             setIsLoading(false);
             if(response.status === 200){
-                navigation.replace('FindUser');
+                navigation.replace('home');
             } else {
                 navigation.replace('Login');
             }
