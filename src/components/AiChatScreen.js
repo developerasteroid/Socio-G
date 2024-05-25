@@ -5,6 +5,7 @@ import { GiftedChat, Send } from "react-native-gifted-chat";
 import { Ionicons } from "@expo/vector-icons";
 import { getDataWithExpiry, getRandomUUID, selfUID, storeDataWithExpiry } from "../utils/Functions";
 import axiosInstance from "../config/axiosConfig";
+import Toast from "react-native-toast-message";
 
 
 export default function AiChatScreen ({navigation, route}) {
@@ -92,7 +93,21 @@ export default function AiChatScreen ({navigation, route}) {
                 setMessages(previousMessages => GiftedChat.append(previousMessages, chatApiRespose));
             }
         } catch (error) {
-            alert(error.message);
+            if(error.response && error.response.data && error.response.data.message){
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.response.data.message,
+                    position:'top'  
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.message,
+                    position:'top'  
+                })
+            }
         }
         setLoading(false);
     }

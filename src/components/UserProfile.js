@@ -27,6 +27,9 @@ export default function UserProfile({navigation, route}){
 
     const {uid} = route.params;
 
+    const [menuActive, setmenuActive] = useState(false);
+
+
     const [isLoading, setIsLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
     
@@ -289,12 +292,12 @@ export default function UserProfile({navigation, route}){
                             <Text style={styles.followTxt}>{isFollowing? 'Following' : (isFollowRequested ? 'Requested' : 'Follow')}</Text>
                         }
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.chatBtn}>
+                    {/* <TouchableOpacity style={styles.chatBtn}>
                         <Image
                         source={require('./../../assets/chat-icon.png')}
                         style={styles.chatBtnImg}
                         />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>
         );
@@ -338,13 +341,36 @@ export default function UserProfile({navigation, route}){
                 </TouchableOpacity>
                 <Text style={styles.username}>{username}</Text>
                 </View>
-                <View>
-                    <TouchableOpacity>
+                <View style={{position:'relative', zIndex:99}}>
+                    <TouchableOpacity
+                    onPress={()=>{
+                        setmenuActive((prev) => !prev);
+                    }}
+                    >
                     <Image
                     style={styles.menu_icon}
                     source={require('../../assets/dot-menu-icon.png')}
                     />
                     </TouchableOpacity>
+
+                    {
+                        menuActive &&
+
+                    <View 
+                    style={{position:'absolute', borderRadius:4, top:-5, right:'120%', width:130, backgroundColor:'#444', padding:2}}
+                    >
+                        <TouchableOpacity
+                        style={{paddingVertical:5, alignItems:'center'}}
+                        onPress={()=>{
+                            setmenuActive(false);
+                            navigation.navigate('report', {type:'user', id:uid});
+                        }}
+                        >
+                            <Text style={{color:'#ffffff', fontSize:16, fontWeight:'500'}}>Report</Text>
+                        </TouchableOpacity>
+                    </View>
+                    }
+
                 </View>
             </View>
             
@@ -355,7 +381,7 @@ export default function UserProfile({navigation, route}){
                     ListHeaderComponent={renderHeaderComponent}
                     renderItem={({item}) => {
                         return (
-                            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="report" menuCallback={() => {console.log('report');}}/>
+                            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="Report" menuCallback={(item)=>{navigation.navigate('report', {type:'post', id: item._id});}}/>
                         )
                     }}
                     ListEmptyComponent={renderPostsEmpty}

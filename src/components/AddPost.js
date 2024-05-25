@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Video } from "expo-av";
 import * as FileSystem from 'expo-file-system';
 import axiosInstance from "../config/axiosConfig";
+import Toast from "react-native-toast-message";
 
 
 
@@ -103,9 +104,19 @@ export default function AddPost({navigation}){
             }          
         } catch (error) {
             if(error.response && error.response.data && error.response.data.message){
-                alert(error.response.data.message);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.response.data.message,
+                    position:'top'  
+                });
             } else {
-                alert(error.message);
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.message,
+                    position:'top'  
+                })
             }
         }
         setIsLoading(false);

@@ -24,6 +24,8 @@ import MenuPage from './src/components/MenuPage';
 import CommentPage from './src/components/CommentPage';
 import AiChatHome from './src/components/AiChatHome';
 import AiChatScreen from './src/components/AiChatScreen';
+import ReportPage from './src/components/ReportPage';
+import Toast from 'react-native-toast-message';
 
 
 
@@ -85,13 +87,11 @@ export default function App() {
         <Stack.Screen name='comment' component={CommentPage} options={{headerShown:false}}/>
         <Stack.Screen name='aiChatHome' component={AiChatHome} options={{headerShown:false}}/>
         <Stack.Screen name='aiChatScreen' component={AiChatScreen} options={{headerShown:false}}/>
-
-        
-
-
+        <Stack.Screen name='report' component={ReportPage} options={{headerShown:false}}/>
 
 
       </Stack.Navigator>
+      <Toast />
     </NavigationContainer>
   );
 }

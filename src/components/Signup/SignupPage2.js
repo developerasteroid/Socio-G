@@ -184,7 +184,8 @@ export default function SignupPage2({navigation, route}){
                         }],
                       });
                 } else {
-                    console.log(result);
+                    // console.log(result);
+                    alert('Something went wrong');
                 }
             } else if(result.status && result.data.message){
                 Alert.alert(result.status.toString(), result.data.message);

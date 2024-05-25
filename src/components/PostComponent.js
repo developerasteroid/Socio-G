@@ -116,7 +116,7 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                         setPostData(modified);
                         const response = await axiosInstance.get(`api/post/like/${item._id}`)
                     } catch (error) {
-                        console.log(error);
+                        // console.log(error);
                         const modified = postData.map((post)=> {
                             if(post._id == item._id){
                                 let newData = post;
@@ -142,7 +142,7 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                         setPostData(modified);
                         const response = await axiosInstance.get(`api/post/dislike/${item._id}`)
                     } catch (error) {
-                        console.log(error);
+                        // console.log(error);
                         const modified = postData.map((post)=> {
                             if(post._id == item._id){
                                 let newData = post;

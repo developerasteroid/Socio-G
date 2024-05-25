@@ -150,11 +150,12 @@ export default function Profile({navigation}){
     if(!username){
         return(
             <>
-                <View style={styles.mainContainer}>
+                <View style={[styles.mainContainer, {paddingBottom: bottomNavigationHeight}]}>
                     <View style={styles.loadingContainer}>
                         {isLoading && <ActivityIndicator size='large' color='#ffffff'/>}
                         {fetchError && <Text style={{color:'#ffffff'}}>{fetchError}</Text>}
                     </View>
+                    <BottomNavigation componentHightSetter={setBottomNavigationHeight}/>
                 </View>
             </>
         );
