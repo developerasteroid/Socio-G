@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, Image, ActivityIndicator, FlatList, RefreshControl} from "react-native";
+import { View, Text, StyleSheet, StatusBar, TextInput, TouchableOpacity, Image, ActivityIndicator, FlatList, RefreshControl, Alert} from "react-native";
 import Toast from "react-native-toast-message";
 import axiosInstance from "../config/axiosConfig";
-import { timeAgo } from "../utils/Functions";
+import { selfUID, timeAgo } from "../utils/Functions";
 
 export default function CommentPage({navigation, route}){
+    const [selfId, setSelfId] = useState(null);
     const [commentListData, setCommentListData] = useState([]);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [fetchError, setFetchError] = useState('');
     const [isRefresh, setIsRefresh] = useState(false);
     const [commentInput, setCommentInput] = useState('');
     const [isCommentSubmitted, setIsCommentSubmitted] = useState(false);
+    const [activeComment, setActiveComment] = useState(null);
 
 
     if(!(route.params && route.params.pid)){
@@ -47,8 +49,13 @@ export default function CommentPage({navigation, route}){
 
 
     useEffect(()=>{
+        (async() => {
+            const id = await selfUID();
+            setSelfId(id);
+        })();
         fetchCommentsData();
     }, [fetchCommentsData]);
+
 
     const handleCommentSubmit = useCallback(async()=>{
         if(!commentInput){
@@ -95,6 +102,40 @@ export default function CommentPage({navigation, route}){
     }, [commentInput, setCommentInput, axiosInstance, route.params.pid, Toast, navigation, fetchCommentsData, isCommentSubmitted, setIsCommentSubmitted])
 
 
+    const deleteComment = async(cid) => {
+        setIsDataLoaded(false);
+        setFetchError('');
+        try {
+            const response = await axiosInstance.post('api/post/comment/delete', {
+                commentId:cid
+            })
+            if(response.status == 200){
+                Toast.show({
+                    type: 'success',
+                    text1: 'Comment Deleted Successfully',
+                    position:'top'
+                });
+                fetchCommentsData();
+            }
+        } catch (error) {
+            setIsDataLoaded(true);
+            if(error.response && error.response.data && error.response.data.message){
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.response.data.message,
+                    position:'top'
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Error',
+                    text2: error.message,
+                    position:'top'
+                });
+            }
+        }
+    }
 
 
 
@@ -115,7 +156,21 @@ export default function CommentPage({navigation, route}){
 
     const commentComponentRender = ({item}) => {
         return (
-            <View style={{ paddingHorizontal:15, paddingTop:10, paddingBottom:5 , borderBottomWidth:1, borderBottomColor:'#252525', flexDirection:'row', gap:10}}>
+                <TouchableOpacity 
+                activeOpacity={(item.userId == selfId ? 0.75 : 1)}
+                onLongPress={()=>{
+                    if(item.userId == selfId){
+                        setActiveComment(item._id);
+                    }
+                }}
+                onPress={()=>{
+                    if(item._id == activeComment){
+                        setActiveComment(null);
+                    }
+                }}
+                
+                >
+                <View style={[{ paddingHorizontal:15, paddingTop:10, paddingBottom:5 , borderBottomWidth:1, borderBottomColor:'#252525', flexDirection:'row', gap:10, position:'relative'}, {backgroundColor: (item._id == activeComment ? '#8009' : '#0000')}]}>
                     <View>
                         <Image
                         source={{uri: item.profileImageUrl}}
@@ -127,7 +182,44 @@ export default function CommentPage({navigation, route}){
                         <Text style={{color:'#c5c5c5', fontSize:13.5}}>{item.content}</Text>
                         <Text style={{color:'#555', fontSize:12, paddingTop:5}}>{item.createdAt}</Text>
                     </View>
+
+                    {
+                        item._id == activeComment 
+                        &&
+                        <TouchableOpacity
+                        style={{position:'absolute', backgroundColor:'#fff', padding:9, top:18, right:18, zIndex:99, borderRadius:12}}
+                        onPress={()=>{
+                            setActiveComment(null);
+                            Alert.alert(
+                                'Delete Comment',
+                                'Do you want to delete this comment?',
+                                [
+                                {
+                                    text:'cancel',
+                                    onPress: () => {
+
+                                    },
+                                    style: 'cancel'
+                                },
+                                {
+                                    text: 'OK',
+                                    onPress: () => {
+                                        deleteComment(item._id);
+                                    },
+                                },
+                                ],
+                                { cancelable: false }
+                            );
+                        }}
+                        >
+                            <Image
+                            source={require('./../../assets/bin.png')}
+                            style={{width:26, height:26, tintColor:'#000'}}
+                            />
+                        </TouchableOpacity>
+                    }
                 </View>
+                </TouchableOpacity>
         );
     }
 
@@ -194,7 +286,7 @@ const styles = StyleSheet.create({
         marginTop:10,
         paddingTop:10,
         borderTopWidth:2,
-        borderColor:'#333'
+        borderColor:'#333',
     },
     cmntInptContainer:{
         position:'relative'
@@ -203,7 +295,8 @@ const styles = StyleSheet.create({
         backgroundColor:'#00000070',
         color:'#fff',
         fontSize:15,
-        paddingHorizontal:15,
+        paddingLeft:15,
+        paddingRight:45,
         paddingVertical:15,
         
     },

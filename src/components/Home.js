@@ -100,7 +100,7 @@ export default function Home({navigation}){
     }, []);
 
     const _viewabilityConfig = {
-        itemVisiblePercentThreshold: 80
+        itemVisiblePercentThreshold: 65
     }
 
     return(

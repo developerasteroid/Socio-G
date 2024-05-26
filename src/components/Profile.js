@@ -143,7 +143,7 @@ export default function Profile({navigation}){
     }, []);
 
     const _viewabilityConfig = {
-        itemVisiblePercentThreshold: 80
+        itemVisiblePercentThreshold: 65
     }
 
 

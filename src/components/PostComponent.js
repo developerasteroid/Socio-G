@@ -3,6 +3,7 @@ import axiosInstance from '../config/axiosConfig';
 import { useEffect, useState } from 'react';
 import { navigate } from '../utils/NavigationUtils';
 import { Video } from 'expo-av';
+import { timeAgo } from '../utils/Functions';
 
 export default function PostComponent({item, postData, setPostData, screenWidth, VisibleItemId, isMuted, setIsMuted, menuText = null, menuCallback = () => {}}){
     let unlikedImg = require('../../assets/unlike-icon.png');
@@ -28,7 +29,16 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                 source={{uri:item.profile}}
                 style={{width:32, height:32, borderRadius:20}}
             />
-            <Text style={styles.feedUserName}>{item.name}</Text>
+            <Text style={styles.feedUserName}>
+                {item.name}
+                {item.isVerified
+                &&
+                <Image
+                source={require('../../assets/verified-icon.png')}
+                style={{width:20, height:20}}
+                />
+                }
+            </Text>
             <View style={{flex:1, alignItems: 'flex-end', position:'relative', zIndex:99}}>
                 {
                     menuText 
@@ -101,13 +111,17 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
             }
             <View style={styles.feedBottomBx}>
                 <View style={styles.like_cmt_shr_icn_container}>
-                <TouchableOpacity onPress={async()=>{
+                <TouchableOpacity 
+                style={styles.like_cmt_shr_btn}
+                activeOpacity={0.6} 
+                onPress={async()=>{
                     if(!item.liked){
                     try {
                         const modified = postData.map((post)=> {
                             if(post._id == item._id){
                                 let newData = post;
                                 newData.liked = true;
+                                newData.likeCount += 1;
                                 return newData;
                             } else {
                                 return post;
@@ -121,6 +135,7 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                             if(post._id == item._id){
                                 let newData = post;
                                 newData.liked = false;
+                                newData.likeCount -= 1;
                                 return newData;
                             } else {
                                 return post;
@@ -134,6 +149,7 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                             if(post._id == item._id){
                                 let newData = post;
                                 newData.liked = false;
+                                newData.likeCount -= 1;
                                 return newData;
                             } else {
                                 return post;
@@ -147,6 +163,7 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                             if(post._id == item._id){
                                 let newData = post;
                                 newData.liked = true;
+                                newData.likeCount += 1;
                                 return newData;
                             } else {
                                 return post;
@@ -161,7 +178,9 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                     style={[item.liked ? {} : styles.bottomIconClr, styles.bottomIconSize]}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity 
+                style={styles.like_cmt_shr_btn}
+                onPress={()=>{
                     navigate('comment', {pid: item._id});
                 }}>
                     <Image 
@@ -175,8 +194,9 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
                 style={[styles.bottomIconClr, styles.bottomIconSize]}
                 /> */}
                 </View>
+                <Text style={styles.likesTxt}>{item.likeCount} like{(item.likeCount > 1 ? 's' : '')}</Text>
                 <Text style={[styles.captionTxt, item.caption == ""? {display:'none'}: {display:'flex'}]}><Text style={styles.unameCaption}>{item.name}</Text> {item.caption}</Text>
-                <Text style={styles.postedDate}>{item.date}</Text>
+                <Text style={styles.postedDate}>{timeAgo(item.createdAt)}</Text>
             </View>
         </View>
     )
@@ -251,12 +271,15 @@ const styles = StyleSheet.create({
     },
     feedBottomBx:{
         paddingVertical:8,
-        marginHorizontal:14
+        marginHorizontal:6
     },
     like_cmt_shr_icn_container:{
         flexDirection:'row',
-        gap:25
-        
+        gap:14
+    },
+    like_cmt_shr_btn:{
+        paddingVertical:4,
+        paddingHorizontal:8
     },
     bottomIconClr:{
         tintColor:'#fff'
@@ -268,13 +291,19 @@ const styles = StyleSheet.create({
     unameCaption:{
         fontWeight:'bold'
     },
+    likesTxt: {
+        color:'#fff',
+        marginTop:2,
+        marginLeft:8
+    },
     captionTxt:{
-        marginTop:10,
-        color:'#fff'
+        color:'#fff',
+        marginLeft:8
     },
     postedDate:{
         color:'#777',
-        fontSize:13
+        fontSize:13,
+        marginLeft:8
     },
     fetchErrorTxt:{
         color:'#ff5555',
