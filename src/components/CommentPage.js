@@ -232,7 +232,7 @@ export default function CommentPage({navigation, route}){
                 <FlatList
                 data={commentListData}
                 renderItem={commentComponentRender}
-                ListEmptyComponent={()=>(<Text style={styles.commentEmptyTxt}>No comments</Text>)}
+                ListEmptyComponent={()=>(<Text style={styles.commentEmptyTxt}>No comments yet</Text>)}
                 refreshControl={
                     <RefreshControl
                     refreshing={isRefresh}
