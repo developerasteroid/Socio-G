@@ -352,7 +352,7 @@ export default function ShareLocation({navigation}) {
                     />
                     <TextInput 
                     style={styles.searchInput} 
-                    placeholder="Search" 
+                    placeholder="Search User" 
                     placeholderTextColor={'#555'}
                     maxLength={60}
                     value={searchText}
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
         color:'#fff',
     },
     bitmojiBx:{
-        padding:10, 
+        padding:5, 
         borderColor:'#999', 
         borderWidth:1, 
         alignItems:'center', 
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
         borderRadius:10
     },
     descriptionInput: {
-        marginTop:10,
+        marginTop:5,
         marginHorizontal:10,
         borderColor:'#777',
         borderRadius:7,
@@ -429,10 +429,10 @@ const styles = StyleSheet.create({
         paddingVertical:4,
         paddingHorizontal:10,
         color:'#ccc',
-        fontSize:16
+        fontSize:14
     },
     searchInput: {
-        marginTop:20,
+        marginTop:8,
         marginHorizontal:10,
         borderColor:'#777',
         borderRadius:7,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     userContainer:{
         // backgroundColor:'#444',
         paddingHorizontal:10,
-        paddingVertical:10,
+        paddingVertical:8,
         marginTop:5
     },
     profileCntainer:{
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     },
     sbmtbtn: {
         backgroundColor: '#0484f5',
-        marginBottom:30,
+        marginBottom:10,
         marginHorizontal:30,
         borderRadius:10
     },

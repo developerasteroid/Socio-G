@@ -85,7 +85,7 @@ export default function Home({navigation}){
 
     const renderFeed = ({item}) => {
         return (
-            <PostComponent item={item} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="Report" menuCallback={(item)=>{navigation.navigate('report', {type:'post', id: item._id});}}/>
+            <PostComponent item={item} navigation={navigation} postData={postData} setPostData={setPostData} screenWidth={screenWidth} VisibleItemId={VisibleItem} isMuted={isMuted} setIsMuted={setIsMuted} menuText="Report" menuCallback={(item)=>{navigation.navigate('report', {type:'post', id: item._id});}}/>
         )
     }
 

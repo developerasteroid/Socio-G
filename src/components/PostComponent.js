@@ -3,13 +3,14 @@ import axiosInstance from '../config/axiosConfig';
 import { useEffect, useState } from 'react';
 import { navigate } from '../utils/NavigationUtils';
 import { Video } from 'expo-av';
-import { timeAgo } from '../utils/Functions';
+import { getRandomUUID, timeAgo } from '../utils/Functions';
 
-export default function PostComponent({item, postData, setPostData, screenWidth, VisibleItemId, isMuted, setIsMuted, menuText = null, menuCallback = () => {}}){
+export default function PostComponent({item, navigation, postData, setPostData, screenWidth, VisibleItemId, isMuted, setIsMuted, menuText = null, menuCallback = () => {}}){
     let unlikedImg = require('../../assets/unlike-icon.png');
     let likedImg = require('../../assets/liked-icon.png');
     let commentImg = require('../../assets/comment-icon.png');
     const [menuActive, setmenuActive] = useState(false);
+    const [isLiked, setIsLiked] = useState(item.liked);
     const [pause, setPause] = useState(false);
     const [videoMute, setVideoMute] = useState(true);
     const [videoPlay, setVideoPlay] = useState(false);
@@ -25,20 +26,26 @@ export default function PostComponent({item, postData, setPostData, screenWidth,
     return(
         <View style={styles.feedCard}>
             <View style={styles.feedTopBx}>
-            <Image
-                source={{uri:item.profile}}
-                style={{width:32, height:32, borderRadius:20}}
-            />
-            <Text style={styles.feedUserName}>
-                {item.name}
-                {item.isVerified
-                &&
-                <Image
-                source={require('../../assets/verified-icon.png')}
-                style={{width:20, height:20}}
-                />
-                }
-            </Text>
+                <TouchableOpacity 
+                activeOpacity={1}
+                style={{flexDirection:'row', justifyContent:'center', alignItems:'center'}}
+                onPress={()=>{navigation?.push('UserProfile', {key:getRandomUUID(), uid: item.author})}}
+                >
+                    <Image
+                        source={{uri:item.profile}}
+                        style={{width:32, height:32, borderRadius:20}}
+                    />
+                    <Text style={styles.feedUserName}>
+                        {item.name}
+                        {item.isVerified
+                        &&
+                        <Image
+                        source={require('../../assets/verified-icon.png')}
+                        style={{width:20, height:20}}
+                        />
+                        }
+                    </Text>
+                </TouchableOpacity>
             <View style={{flex:1, alignItems: 'flex-end', position:'relative', zIndex:99}}>
                 {
                     menuText 
@@ -261,7 +268,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         paddingLeft:10,
-        paddingBottom:5
+        paddingBottom:5,
     },
     feedUserName:{
         color:'#fff',

@@ -48,7 +48,7 @@ export default function Login({navigation}){
         setLoading(true);
         setPasswordError('');
         setUsernameError('');
-        if(!validateUsername(username)){
+        if(!validateUsername(username.trim())){
             setLoading(false);
             setFormSubmit(false);
             return;
@@ -62,7 +62,7 @@ export default function Login({navigation}){
         }
 
         const value = {
-            username:username.toLowerCase(),
+            username:username.toLowerCase().trim(),
             password:password
         }
         
