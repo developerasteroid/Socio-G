@@ -11,6 +11,7 @@ export default function PostComponent({item, navigation, postData, setPostData, 
     let commentImg = require('../../assets/comment-icon.png');
     const [menuActive, setmenuActive] = useState(false);
     const [isLiked, setIsLiked] = useState(item.liked);
+    const [likeCount, setlikeCount] = useState(item.likeCount);
     const [pause, setPause] = useState(false);
     const [videoMute, setVideoMute] = useState(true);
     const [videoPlay, setVideoPlay] = useState(false);
@@ -122,67 +123,75 @@ export default function PostComponent({item, navigation, postData, setPostData, 
                 style={styles.like_cmt_shr_btn}
                 activeOpacity={0.6} 
                 onPress={async()=>{
-                    if(!item.liked){
+                    if(!isLiked){
                     try {
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = true;
-                                newData.likeCount += 1;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
+                        // const modified = postData.map((post)=> {
+                        //     if(post._id == item._id){
+                        //         let newData = post;
+                        //         newData.liked = true;
+                        //         newData.likeCount += 1;
+                        //         return newData;
+                        //     } else {
+                        //         return post;
+                        //     }
+                        // })
+                        // setPostData(modified);
+                        setIsLiked(true);
+                        setlikeCount(prev=> prev + 1);
                         const response = await axiosInstance.get(`api/post/like/${item._id}`)
                     } catch (error) {
                         // console.log(error);
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = false;
-                                newData.likeCount -= 1;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
+                        // const modified = postData.map((post)=> {
+                        //     if(post._id == item._id){
+                        //         let newData = post;
+                        //         newData.liked = false;
+                        //         newData.likeCount -= 1;
+                        //         return newData;
+                        //     } else {
+                        //         return post;
+                        //     }
+                        // })
+                        // setPostData(modified);
+                        setIsLiked(false);
+                        setlikeCount(prev=> prev - 1);
                     }
                 } else {
                     try {
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = false;
-                                newData.likeCount -= 1;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
+                        // const modified = postData.map((post)=> {
+                        //     if(post._id == item._id){
+                        //         let newData = post;
+                        //         newData.liked = false;
+                        //         newData.likeCount -= 1;
+                        //         return newData;
+                        //     } else {
+                        //         return post;
+                        //     }
+                        // })
+                        // setPostData(modified);
+                        setIsLiked(false);
+                        setlikeCount(prev=> prev - 1);
                         const response = await axiosInstance.get(`api/post/dislike/${item._id}`)
                     } catch (error) {
                         // console.log(error);
-                        const modified = postData.map((post)=> {
-                            if(post._id == item._id){
-                                let newData = post;
-                                newData.liked = true;
-                                newData.likeCount += 1;
-                                return newData;
-                            } else {
-                                return post;
-                            }
-                        })
-                        setPostData(modified);
+                        // const modified = postData.map((post)=> {
+                        //     if(post._id == item._id){
+                        //         let newData = post;
+                        //         newData.liked = true;
+                        //         newData.likeCount += 1;
+                        //         return newData;
+                        //     } else {
+                        //         return post;
+                        //     }
+                        // })
+                        // setPostData(modified);
+                        setIsLiked(true);
+                        setlikeCount(prev=> prev + 1);
                     }
                 }
                 }}>
                     <Image 
-                    source={item.liked? likedImg : unlikedImg}
-                    style={[item.liked ? {} : styles.bottomIconClr, styles.bottomIconSize]}
+                    source={isLiked? likedImg : unlikedImg}
+                    style={[isLiked? {} : styles.bottomIconClr, styles.bottomIconSize]}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity 
@@ -201,7 +210,7 @@ export default function PostComponent({item, navigation, postData, setPostData, 
                 style={[styles.bottomIconClr, styles.bottomIconSize]}
                 /> */}
                 </View>
-                <Text style={styles.likesTxt}>{item.likeCount} like{(item.likeCount > 1 ? 's' : '')}</Text>
+                <Text style={styles.likesTxt}>{likeCount} like{(likeCount > 1 ? 's' : '')}</Text>
                 <Text style={[styles.captionTxt, item.caption == ""? {display:'none'}: {display:'flex'}]}><Text style={styles.unameCaption}>{item.name}</Text> {item.caption}</Text>
                 <Text style={styles.postedDate}>{timeAgo(item.createdAt)}</Text>
             </View>
