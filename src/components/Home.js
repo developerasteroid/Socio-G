@@ -11,6 +11,8 @@ export default function Home({navigation}){
     const [isRefresh, setIsRefresh] = useState(false);
     const [fetchError, setFetchError] = useState(false);
     const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
+
+    const [notificationCount, setNotificationCount] = useState(0);
     //for video posts
     const [VisibleItem, setVisibleItem] = useState('');
     const [isMuted, setIsMuted] = useState(true);
@@ -45,6 +47,7 @@ export default function Home({navigation}){
     
 
     const fetchData = async() =>{
+        fetchNotificationCount();
         setIsRefresh(true);
         try{
             const response = await axiosInstance.get('api/post/serve');
@@ -65,7 +68,27 @@ export default function Home({navigation}){
         // setTimeout(()=>{setIsRefresh(false)}, 3000)
         setIsRefresh(false);
     }
+
     useEffect(() => {fetchData()}, []);
+
+    const fetchNotificationCount = async() => {
+        try {
+            const response = await axiosInstance.get('/api/notification/count');
+            if(response.status == 200 && response.data && response.data.count){
+                setNotificationCount(response.data.count);
+            }
+        } catch (error){
+            
+        }
+    }
+
+    useEffect(() => {
+        // Set up the interval
+        const intervalId = setInterval(fetchNotificationCount, 10000);
+
+        // Cleanup function to clear the interval
+        return () => clearInterval(intervalId);
+    }, []);
 
 
 
@@ -107,13 +130,31 @@ export default function Home({navigation}){
         <View style={[styles.mainContainer, {paddingBottom: bottomNavigationHeight}]}>
         <View style={styles.topNavBox}>
             <Text style={styles.appTitleTxt}>Socio-G</Text>
+            <View style={{flexDirection:'row', justifyContent:'center', alignItems:'center', gap:16}}>
+            <TouchableOpacity 
+            style={styles.notifyBtnTouch} 
+            onPress={() => {
+                setNotificationCount(0);
+                navigation.navigate('notification');
+            }}>
+                <Image
+                    style={{tintColor:'#fff', width:28, height:28}}
+                    source={require('../../assets/notification-icon.png')}
+                />
+                {
+                    notificationCount > 0 && 
+                    <View style={styles.notifyCountBx}><Text style={styles.notifyCountTxt}>{notificationCount < 100 ? notificationCount : '99+'}</Text></View>
+                }
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.notifyBtnTouch} onPress={() => navigation.navigate('aiChatHome')}>
                 <Image
                 style={styles.aiChatIcon}
                 source={require('../../assets/ai-chat-icon.png')}
                 />
-                {/* <View style={styles.notifyCountBx}><Text style={styles.notifyCountTxt}>99</Text></View> */}
+                
             </TouchableOpacity>
+            </View>
         </View>
         <View style={styles.feedBox}>
             <FlatList
