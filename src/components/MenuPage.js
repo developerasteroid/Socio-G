@@ -6,12 +6,12 @@ export default function MenuPage({navigation}) {
         <View style={styles.mainContainer}>
             <Text style={styles.mainTopTxt}>MENU</Text>
             
-            <TouchableOpacity style={styles.navigationBtns} onPress={()=>{navigation.navigate('editEmail')}}>
+            {/* <TouchableOpacity style={styles.navigationBtns} onPress={()=>{navigation.navigate('editEmail')}}>
                 <Text style={{color:'#fff', textAlign:'center'}}>Change Email</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.navigationBtns} onPress={async()=>{}}>
                 <Text style={{color:'#fff', textAlign:'center'}}>Change Password</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity 
             style={styles.navigationBtns} 
