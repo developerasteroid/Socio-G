@@ -27,6 +27,7 @@ import AiChatScreen from './src/components/AiChatScreen';
 import ReportPage from './src/components/ReportPage';
 import Toast from 'react-native-toast-message';
 import EditEmail from './src/components/EditEmail';
+import NotificationPage from './src/components/NotificationPage';
 
 
 
@@ -90,6 +91,7 @@ export default function App() {
         <Stack.Screen name='aiChatScreen' component={AiChatScreen} options={{headerShown:false}}/>
         <Stack.Screen name='report' component={ReportPage} options={{headerShown:false}}/>
         <Stack.Screen name='editEmail' component={EditEmail} options={{headerShown:false}}/>
+        <Stack.Screen name='notification' component={NotificationPage} options={{headerShown:false}}/>
 
 
 
